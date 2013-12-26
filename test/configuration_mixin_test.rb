@@ -38,7 +38,7 @@ class ConfigurationMixinTest < ActiveSupport::TestCase
     end
 
     should "build correct prefix" do
-      assert_equal "kasket-#{Kasket::Version::PROTOCOL}/R#{ActiveRecord::VERSION::MAJOR}#{ActiveRecord::VERSION::MINOR}/posts/version=#{POST_VERSION}/", Post.kasket_key_prefix
+      assert_equal "kasket-#{Kasket::Version::PROTOCOL}/R#{ActiveRecord::VERSION::MAJOR}#{ActiveRecord::VERSION::MINOR}/kasket_test/posts/version=#{POST_VERSION}/", Post.kasket_key_prefix
     end
   end
 end

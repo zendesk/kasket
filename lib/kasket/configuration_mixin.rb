@@ -23,7 +23,7 @@ module Kasket
     end
 
     def kasket_key_prefix
-      @kasket_key_prefix ||= "kasket-#{Kasket::Version::PROTOCOL}/#{kasket_activerecord_version}/#{table_name}/version=#{column_names.join.sum}/"
+      @kasket_key_prefix ||= "kasket-#{Kasket::Version::PROTOCOL}/#{kasket_activerecord_version}/#{connection_config[:database]}/#{table_name}/version=#{column_names.join.sum}/"
     end
 
     def kasket_activerecord_version
