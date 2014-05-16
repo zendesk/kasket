@@ -44,14 +44,14 @@ class CacheableTest < ActiveSupport::TestCase
       should "write result in cache if all results are kasket_cacheable?" do
         Comment.any_instance.stubs(:kasket_cacheable?).returns(true)
         Kasket.cache.expects(:write).times(@comment_records.size + 1)
-        Comment.all(:conditions => {:post_id => 1})
+        Comment.where(:post_id => 1).to_a
       end
 
       should "not write result in cache if any of them are not kasket_cacheable?" do
         @comment_records[0].expects(:kasket_cacheable?).returns(true)
         @comment_records[1].expects(:kasket_cacheable?).returns(false)
         Kasket.cache.expects(:write).never
-        Comment.all(:conditions => {:post_id => 1})
+        Comment.where(:post_id => 1).to_a
       end
     end
   end

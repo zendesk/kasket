@@ -15,32 +15,32 @@ class FindOneTest < ActiveSupport::TestCase
   should "only cache on indexed attributes" do
     Kasket.cache.expects(:read).twice
     Post.find_by_id(1)
-    Post.find_by_id(1, :conditions => {:blog_id => 2})
+    Post.where(:blog_id => 2).find_by_id 1
 
     Kasket.cache.expects(:read).never
-    Post.first :conditions => {:blog_id => 2}
+    Post.where(:blog_id => 2).first
   end
 
   should "not use cache when using the :select option" do
     post = Post.first
     assert_nil(Kasket.cache.read(post.kasket_key))
 
-    Post.find(post.id, :select => 'title')
+    Post.select('title').find(post.id)
     assert_nil(Kasket.cache.read(post.kasket_key))
 
     Post.find(post.id)
     assert(Kasket.cache.read(post.kasket_key))
 
     Kasket.cache.expects(:read)
-    Post.find(post.id, :select => nil)
+    Post.find(post.id)
 
     Kasket.cache.expects(:read).never
-    Post.find(post.id, :select => 'title')
+    Post.select('title').find(post.id)
   end
 
   should "respect scope" do
     post = Post.find(Post.first.id)
-    other_blog = Blog.first(:conditions => "id != #{post.blog_id}")
+    other_blog = Blog.where("id != #{post.blog_id}").first
 
     assert(Kasket.cache.read(post.kasket_key))
 

@@ -1,36 +1,24 @@
-require 'rubygems'
-
-require 'bundler'
-Bundler.setup
-# shoulda-matchers dependency:
-require 'active_support/core_ext/module/delegation'
-Bundler.require(:default, :development)
-
-if defined?(Debugger)
-  ::Debugger.start
-  ::Debugger.settings[:autoeval] = true if ::Debugger.respond_to?(:settings)
-end
-
-require 'test/unit'
+require 'bundler/setup'
+require 'minitest/autorun'
+require 'minitest/rg'
+require 'shoulda/context'
 require 'mocha/setup'
 require 'active_record'
-require "logger"
+require 'logger'
 
-raise "Must configure #time_zone_aware_attributes prior to models" if defined?(Post)
 ENV['TZ'] = 'UTC'
 ActiveRecord::Base.time_zone_aware_attributes = true
 ActiveRecord::Base.logger = Logger.new(StringIO.new)
 
 require 'active_record/fixtures'
-
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'kasket'
 
 Kasket.setup
 
 class ActiveSupport::TestCase
   include ActiveRecord::TestFixtures
+  self.fixture_path = File.dirname(__FILE__) + "/fixtures/"
+  fixtures :all
 
   def create_fixtures(*table_names)
     if block_given?
@@ -50,27 +38,22 @@ class ActiveSupport::TestCase
   end
 end
 
-ActiveSupport::TestCase.fixture_path = File.dirname(__FILE__) + "/fixtures/"
-$LOAD_PATH.unshift(ActiveSupport::TestCase.fixture_path)
-
-class ActiveSupport::TestCase
-  fixtures :all
-end
-
 module Rails
-  module_function
-  CACHE = ActiveSupport::Cache::MemoryStore.new
-  LOGGER = Logger.new(STDOUT)
+  class << self
+    def cache
+      @cache ||= ActiveSupport::Cache::MemoryStore.new
+    end
 
-  def cache
-    CACHE
-  end
+    def logger
+      ActiveRecord::Base.logger
+    end
 
-  def logger
-    LOGGER
+    def env
+      'development'
+    end
   end
 end
 
-require 'test_models'
+require './test/test_models'
 POST_VERSION = Post.column_names.join.sum
 COMMENT_VERSION = Comment.column_names.join.sum

@@ -24,7 +24,7 @@ module Kasket
       @model_class.columns_hash[name.to_s]
     end
 
-    def visit_Arel_Nodes_SelectStatement(node)
+    def visit_Arel_Nodes_SelectStatement(node, *_)
       return :unsupported if node.with
       return :unsupported if node.offset
       return :unsupported if node.lock
@@ -42,7 +42,7 @@ module Kasket
       query
     end
 
-    def visit_Arel_Nodes_SelectCore(node)
+    def visit_Arel_Nodes_SelectCore(node, *_)
       return :unsupported if node.groups.any?
       return :unsupported if node.having
       return :unsupported if node.set_quantifier
@@ -60,45 +60,45 @@ module Kasket
       parts.include?(:unsupported) ? :unsupported : parts
     end
 
-    def visit_Arel_Nodes_Limit(node)
+    def visit_Arel_Nodes_Limit(node, *_)
       {:limit => node.value.to_i}
     end
 
-    def visit_Arel_Nodes_JoinSource(node)
+    def visit_Arel_Nodes_JoinSource(node, *_)
       return :unsupported if !node.left || node.right.any?
       return :unsupported if !node.left.is_a?(Arel::Table)
       visit(node.left)
     end
 
-    def visit_Arel_Table(node)
+    def visit_Arel_Table(node, *_)
       {:from => node.name}
     end
 
-    def visit_Arel_Nodes_And(node)
+    def visit_Arel_Nodes_And(node, *_)
       attributes = node.children.map { |child| visit(child) }
       return :unsupported if attributes.include?(:unsupported)
       attributes.sort! { |pair1, pair2| pair1[0].to_s <=> pair2[0].to_s }
       { :attributes => attributes }
     end
 
-    def visit_Arel_Nodes_In(node)
+    def visit_Arel_Nodes_In(node, *_)
       left = visit(node.left)
       return :unsupported if left != :id
 
       [left, visit(node.right)]
     end
 
-    def visit_Arel_Nodes_Equality(node)
+    def visit_Arel_Nodes_Equality(node, *_)
       right = node.right
       [visit(node.left), right ? visit(right) : nil]
     end
 
-    def visit_Arel_Attributes_Attribute(node)
+    def visit_Arel_Attributes_Attribute(node, *_)
       self.last_column = column_for(node.name)
       node.name.to_sym
     end
 
-    def literal(node)
+    def literal(node, *_)
       if node == '?'
         column, value = @binds.shift
         value.to_s
@@ -108,11 +108,11 @@ module Kasket
     end
 
     # only gets used on 1.8.7
-    def visit_Arel_Nodes_BindParam(x)
+    def visit_Arel_Nodes_BindParam(x, *_)
       @binds.shift[1]
     end
 
-    def visit_Array(node)
+    def visit_Array(node, *_)
       node.map {|value| quoted(value) }
     end
 

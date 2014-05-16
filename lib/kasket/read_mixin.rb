@@ -55,7 +55,7 @@ module Kasket
 
         id_key_map = Hash[missing_keys.map{|key| [key.split('=').last.to_i, key] }]
 
-        found = without_kasket { find_all_by_id(id_key_map.keys) }
+        found = without_kasket { where(:id => id_key_map.keys).to_a }
         found.each(&:store_in_kasket)
         Hash[found.map{|record| [id_key_map[record.id], record] }]
       end

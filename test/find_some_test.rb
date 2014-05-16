@@ -42,7 +42,7 @@ class FindSomeTest < ActiveSupport::TestCase
 
   context "unfound" do
     should "ignore unfound when using find_all_by_id" do
-      found_posts = Post.find_all_by_id([@post1.id, 1231232])
+      found_posts = Post.where(:id => [@post1.id, 1231232]).to_a
       assert_equal [@post1.id], found_posts.map(&:id)
     end
 
