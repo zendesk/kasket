@@ -1,5 +1,6 @@
 require 'bundler/setup'
-require 'test/unit'
+require 'minitest/autorun'
+require 'minitest/rg'
 require 'shoulda/context'
 require 'mocha/setup'
 require 'active_record'
@@ -51,6 +52,6 @@ module Rails
   end
 end
 
-require 'test_models'
+require './test/test_models'
 POST_VERSION = Post.column_names.join.sum
 COMMENT_VERSION = Comment.column_names.join.sum
