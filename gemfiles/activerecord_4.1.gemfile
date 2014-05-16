@@ -5,7 +5,6 @@ source "http://rubygems.org"
 gem "mysql2", "~> 0.3", :platforms=>:ruby
 gem "activerecord-jdbcmysql-adapter", "~> 1.2", :platforms=>:jruby
 gem "mocha", :require=>false
-gem "activerecord", "~> 3.2.1", :require=>"active_record"
-gem "minitest", "~> 4.7.0"
+gem "activerecord", "~> 4.1.1", :require=>"active_record"
 
 gemspec :path=>"../"

@@ -47,6 +47,10 @@ module Rails
     def logger
       ActiveRecord::Base.logger
     end
+
+    def env
+      'development'
+    end
   end
 end
 

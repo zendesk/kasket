@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description = "puts a cap on your queries"
   s.license     = "Apache License Version 2.0"
 
-  s.add_runtime_dependency("activerecord", ">= 3.2", "< 4.1")
+  s.add_runtime_dependency("activerecord", ">= 3.2", "< 4.2")
 
   s.add_development_dependency("rake")
   s.add_development_dependency("bundler")
@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("shoulda-context")
   s.add_development_dependency("mocha")
   s.add_development_dependency("wwtd")
-  s.add_development_dependency("minitest", "~>4.2")
+  s.add_development_dependency("minitest")
   s.add_development_dependency("minitest-rg")
 
   s.files        = Dir.glob("lib/**/*") + %w(README.rdoc)
