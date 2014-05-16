@@ -39,16 +39,14 @@ class ActiveSupport::TestCase
 end
 
 module Rails
-  module_function
-  CACHE = ActiveSupport::Cache::MemoryStore.new
-  LOGGER = Logger.new(STDOUT)
+  class << self
+    def cache
+      @cache ||= ActiveSupport::Cache::MemoryStore.new
+    end
 
-  def cache
-    CACHE
-  end
-
-  def logger
-    LOGGER
+    def logger
+      ActiveRecord::Base.logger
+    end
   end
 end
 

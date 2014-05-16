@@ -32,7 +32,7 @@ class Post < ActiveRecord::Base
 
   def make_dirty!
     self.updated_at = Time.now
-    self.connection.execute("UPDATE posts SET updated_at = '#{updated_at.utc.to_s(:db)}' WHERE id = #{id}")
+    self.class.connection.execute("UPDATE posts SET updated_at = '#{updated_at.utc.to_s(:db)}' WHERE id = #{id}")
   end
 
   kasket_dirty_methods :make_dirty!
