@@ -1,7 +1,6 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'minitest/rg'
-require 'shoulda/context'
 require 'mocha/setup'
 require 'active_record'
 require 'logger'
@@ -16,6 +15,10 @@ require 'kasket'
 Kasket.setup
 
 class ActiveSupport::TestCase
+  # all tests inherit from this
+  extend MiniTest::Spec::DSL
+  register_spec_type(self) { |desc| true }
+
   include ActiveRecord::TestFixtures
   self.fixture_path = File.dirname(__FILE__) + "/fixtures/"
   fixtures :all

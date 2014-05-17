@@ -1,9 +1,9 @@
 require_relative "helper"
 
-class FindOneTest < ActiveSupport::TestCase
+describe "find one" do
   fixtures :blogs, :posts
 
-  should "cache find(id) calls" do
+  it "cache find(id) calls" do
     post = Post.first
     Kasket.cache.write(post.kasket_key, nil)
     assert_equal(post, Post.find(post.id))
@@ -12,7 +12,7 @@ class FindOneTest < ActiveSupport::TestCase
     assert_equal(post, Post.find(post.id))
   end
 
-  should "only cache on indexed attributes" do
+  it "only cache on indexed attributes" do
     Kasket.cache.expects(:read).twice
     Post.find_by_id(1)
     Post.where(:blog_id => 2).find_by_id 1
@@ -21,7 +21,7 @@ class FindOneTest < ActiveSupport::TestCase
     Post.where(:blog_id => 2).first
   end
 
-  should "not use cache when using the :select option" do
+  it "not use cache when using the :select option" do
     post = Post.first
     assert_nil(Kasket.cache.read(post.kasket_key))
 
@@ -38,7 +38,7 @@ class FindOneTest < ActiveSupport::TestCase
     Post.select('title').find(post.id)
   end
 
-  should "respect scope" do
+  it "respect scope" do
     post = Post.find(Post.first.id)
     other_blog = Blog.where("id != #{post.blog_id}").first
 
@@ -49,7 +49,7 @@ class FindOneTest < ActiveSupport::TestCase
     end
   end
 
-  should "use same scope when finding on has_many" do
+  it "use same scope when finding on has_many" do
     post = Blog.first.posts.first
     blog = Blog.first
     Rails.cache.clear

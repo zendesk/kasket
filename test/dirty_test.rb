@@ -1,9 +1,9 @@
 require_relative "helper"
 
-class DirtyTest < ActiveSupport::TestCase
+describe "dirty" do
   fixtures :blogs, :posts
 
-  should "clear the indices when a dirty method is called" do
+  it "clear the indices when a dirty method is called" do
     post = Post.first
 
     Post.cache { pots = Post.find(post.id) }

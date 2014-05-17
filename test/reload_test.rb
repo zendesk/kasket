@@ -1,17 +1,16 @@
 require_relative "helper"
 
-class ReloadTest < ActiveSupport::TestCase
-  context "Reloading a model" do
-    setup do
+describe "reload" do
+  describe "Reloading a model" do
+    before do
       @post = Post.first
       assert @post
       assert @post.title
     end
 
-    should "clear local cache" do
+    it "clear local cache" do
       Kasket.expects(:clear_local)
       @post.reload
     end
   end
-
 end
