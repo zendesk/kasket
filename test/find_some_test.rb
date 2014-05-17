@@ -1,9 +1,9 @@
 require File.expand_path("helper", File.dirname(__FILE__))
 
-class FindSomeTest < ActiveSupport::TestCase
+describe "find some" do
   fixtures :blogs, :posts
 
-  def setup
+  before do
     @post1 = Post.first
     @post2 = Post.last
     Post.find(@post1.id, @post2.id)
@@ -11,12 +11,12 @@ class FindSomeTest < ActiveSupport::TestCase
     assert Kasket.cache.read(@post2.kasket_key)
   end
 
-  should "use cache for find(id, id) calls" do
+  it "use cache for find(id, id) calls" do
     Post.connection.expects(:select_all).never
     Post.find(@post1.id, @post2.id)
   end
 
-  should "cache when found using find(id, id) calls" do
+  it "cache when found using find(id, id) calls" do
     Kasket.cache.delete(@post1.kasket_key)
     Kasket.cache.delete(@post2.kasket_key)
 
@@ -26,7 +26,7 @@ class FindSomeTest < ActiveSupport::TestCase
     assert Kasket.cache.read(@post2.kasket_key)
   end
 
-  should "only lookup the records that are not in the cache" do
+  it "only lookup the records that are not in the cache" do
     Kasket.cache.delete(@post2.kasket_key)
 
     # has to lookup post2 via db
@@ -40,13 +40,13 @@ class FindSomeTest < ActiveSupport::TestCase
     assert_equal [@post1, @post2].map(&:id).sort, found_posts.map(&:id).sort
   end
 
-  context "unfound" do
-    should "ignore unfound when using find_all_by_id" do
+  describe "unfound" do
+    it "ignore unfound when using find_all_by_id" do
       found_posts = Post.where(:id => [@post1.id, 1231232]).to_a
       assert_equal [@post1.id], found_posts.map(&:id)
     end
 
-    should "not ignore unfound when using find" do
+    it "not ignore unfound when using find" do
       assert_raise ActiveRecord::RecordNotFound do
         Post.find(@post1.id, 1231232)
       end
