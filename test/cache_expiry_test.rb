@@ -1,22 +1,22 @@
 require File.expand_path("helper", File.dirname(__FILE__))
 
-class CacheExpiryTest < ActiveSupport::TestCase
+describe "cache expiry" do
   fixtures :blogs, :posts
 
-  context "a cached object" do
-    setup do
+  describe "a cached object" do
+    before do
       post = Post.first
       @post = Post.find(post.id)
 
       assert(Kasket.cache.read(@post.kasket_key))
     end
 
-    should "be removed from cache when deleted" do
+    it "be removed from cache when deleted" do
       @post.destroy
       assert_nil(Kasket.cache.read(@post.kasket_key))
     end
 
-    should "clear all indices for instance when deleted" do
+    it "clear all indices for instance when deleted" do
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "id=#{@post.id}")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'/first")
@@ -26,13 +26,13 @@ class CacheExpiryTest < ActiveSupport::TestCase
       @post.destroy
     end
 
-    should "be removed from cache when updated" do
+    it "be removed from cache when updated" do
       @post.title = "new_title"
       @post.save
       assert_nil(Kasket.cache.read(@post.kasket_key))
     end
 
-    should "clear all indices for instance when updated" do
+    it "clear all indices for instance when updated" do
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "id=#{@post.id}")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'/first")
@@ -44,6 +44,5 @@ class CacheExpiryTest < ActiveSupport::TestCase
       @post.title = "new_title"
       @post.save
     end
-
   end
 end

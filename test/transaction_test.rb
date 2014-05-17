@@ -1,8 +1,8 @@
 require File.expand_path("helper", File.dirname(__FILE__))
 
-class TransactionTest < ActiveSupport::TestCase
-  context "Transactions" do 
-    should "have kasket disabled" do
+describe "transactions" do
+  describe "normal" do
+    it "have kasket disabled" do
       assert_equal true, Post.use_kasket?
       Post.transaction do
         assert_equal false, Post.use_kasket?
@@ -11,9 +11,9 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  context "Nested transactions" do
-    setup { Comment.has_kasket } 
-    should "disable kasket" do 
+  describe "nested" do
+    before { Comment.has_kasket }
+    it "disable kasket" do
       Post.transaction do
         assert_equal false,  Comment.use_kasket?
         assert_equal false, Post.use_kasket?
