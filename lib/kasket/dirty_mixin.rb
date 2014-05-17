@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 module Kasket
   module DirtyMixin
     def kasket_dirty_methods(*method_names)
