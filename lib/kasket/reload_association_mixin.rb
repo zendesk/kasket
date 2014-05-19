@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 module Kasket
   module ReloadAssociationMixin
     def reload_with_kasket_clearing(*args)
