@@ -6,9 +6,11 @@ describe "find one" do
   it "cache find(id) calls" do
     post = Post.first
     Kasket.cache.write(post.kasket_key, nil)
+
     assert_equal(post, Post.find(post.id))
     assert(Kasket.cache.read(post.kasket_key))
-    Post.connection.expects(:select_all).never
+
+    Post.expects(:find_by_sql_without_kasket).never
     assert_equal(post, Post.find(post.id))
   end
 
@@ -52,9 +54,9 @@ describe "find one" do
   it "use same scope when finding on has_many" do
     post = Blog.first.posts.first
     blog = Blog.first
-    Rails.cache.clear
+    Kasket.cache.clear
 
-    post = blog.posts.find_by_id(post.id)
+    post = blog.posts.find(post.id)
     key  = post.kasket_key.sub(%r{(/id=#{post.id})}, "/blog_id=#{Blog.first.id}\\1")
     assert(Kasket.cache.read(key))
   end
