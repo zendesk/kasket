@@ -2,7 +2,8 @@ script: rake test
 bundler_args: ""
 rvm:
   - 1.9.3
-  - 2.0.0-p353
+  - 2.0.0
+  - 2.1.1
   - jruby
 gemfile:
   - gemfiles/activerecord_3.2.gemfile
