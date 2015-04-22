@@ -4,6 +4,8 @@ module Kasket
       if arel.is_a?(Arel::SelectManager)
         arel.to_kasket_query(klass, binds)
       end
+    rescue TypeError # unsupported object in ast
+      return nil
     end
   end
 end
