@@ -3,6 +3,7 @@ module Kasket
 
     module ClassMethods
       def remove_from_kasket(ids)
+        raise ArgumentError.new("unable to remove cache keyed on multiple attributes") if kasket_indices.any?{|ki| ki.size > 1 }
         Array(ids).each do |id|
           Kasket.cache.delete(kasket_key_for_id(id))
         end
