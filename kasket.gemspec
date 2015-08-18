@@ -14,7 +14,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency("rake")
   s.add_development_dependency("bundler")
-  s.add_development_dependency("appraisal", "~> 0.5.0") # 1.0.0 has new commands and produces incorrect rails 3.2 gemfile
   s.add_development_dependency("mocha")
   s.add_development_dependency("wwtd")
   s.add_development_dependency("minitest")

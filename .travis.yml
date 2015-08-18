@@ -1,11 +1,22 @@
-script: rake test
-bundler_args: ""
+script: bundle exec rake test
+sudo: false
+cache: bundler
 rvm:
   - 1.9.3
   - 2.0.0
-  - 2.1.1
+  - 2.1.6
+  - 2.2.2
   - jruby
 gemfile:
   - gemfiles/activerecord_3.2.gemfile
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
+branches:
+  only: [master]
+matrix:
+  exclude:
+    - rvm: 2.2.2
+      gemfile: gemfiles/activerecord_3.2.gemfile
+  allow_failures:
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_4.1.gemfile
