@@ -5,6 +5,7 @@ module Kasket
     def initialize(model_class, binds)
       @model_class = model_class
       @binds       = binds.dup
+      super()
     end
 
     def accept(node)
@@ -107,13 +108,16 @@ module Kasket
       end
     end
 
-    # only gets used on 1.8.7
     def visit_Arel_Nodes_BindParam(x, *_)
-      @binds.shift[1]
+      visit(@binds.shift[1])
     end
 
     def visit_Array(node, *_)
-      node.map {|value| quoted(value) }
+      node.map {|value| visit(value) }
+    end
+
+    def visit_Arel_Nodes_Casted(node, *_)
+      quoted(node.val)
     end
 
     #TODO: We are actually not using this?

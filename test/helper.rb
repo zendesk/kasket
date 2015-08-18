@@ -14,6 +14,8 @@ require 'kasket'
 
 Kasket.setup
 
+ActiveSupport.test_order = :random if ActiveSupport.respond_to?(:test_order=)
+
 class ActiveSupport::TestCase
   # all tests inherit from this
   extend MiniTest::Spec::DSL

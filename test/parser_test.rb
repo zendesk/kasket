@@ -42,11 +42,7 @@ describe Kasket::QueryParser do
 
     it "extract conditions with parans that do not surround" do
       kasket_query = parse(:conditions => "(title = 'red') AND (blog_id = 1)")
-      if ActiveRecord::VERSION::STRING > "3.1.0"
-        assert !kasket_query
-      else
-        assert_equal [[:blog_id, "1"], [:title, "red"]], kasket_query[:attributes]
-      end
+      assert !kasket_query
     end
 
     it "extract required index" do

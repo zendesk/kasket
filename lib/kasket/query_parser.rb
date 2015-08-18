@@ -10,14 +10,14 @@ module Kasket
 
     def initialize(model_class)
       @model_class = model_class
-      @supported_query_pattern = /^select \* from (?:`|")#{@model_class.table_name}(?:`|") where \((.*)\)(|\s+limit 1)\s*$/i
+      @supported_query_pattern = /^select\s+((?:`|")#{@model_class.table_name}(?:`|")\.)?\* from (?:`|")#{@model_class.table_name}(?:`|") where (.*?)(|\s+limit 1)\s*$/i
       @table_and_column_pattern = /(?:(?:`|")?#{@model_class.table_name}(?:`|")?\.)?(?:`|")?([a-zA-Z]\w*)(?:`|")?/ # Matches: `users`.id, `users`.`id`, users.id, id
       @key_eq_value_pattern = /^[\(\s]*#{@table_and_column_pattern}\s+(=|IN)\s+#{VALUE}[\)\s]*$/ # Matches: KEY = VALUE, (KEY = VALUE), ()(KEY = VALUE))
     end
 
     def parse(sql)
       if match = @supported_query_pattern.match(sql)
-        where, limit = match[1], match[2]
+        where, limit = match[2], match[3]
 
         query = Hash.new
         query[:attributes] = sorted_attribute_value_pairs(where)

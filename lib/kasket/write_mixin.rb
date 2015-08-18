@@ -31,7 +31,7 @@ module Kasket
 
       def store_in_kasket
         if kasket_cacheable? && kasket_key
-          Kasket.cache.write(kasket_key, @attributes.dup)
+          Kasket.cache.write(kasket_key, @attributes.to_h.dup)
         end
       end
 
@@ -90,4 +90,3 @@ module Kasket
     end
   end
 end
-
