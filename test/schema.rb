@@ -1,4 +1,4 @@
-ActiveRecord::Schema.define(:version => 1) do
+ActiveRecord::Schema.define do
   suppress_messages do
     create_table 'comments', :force => true do |t|
       t.text     'body'

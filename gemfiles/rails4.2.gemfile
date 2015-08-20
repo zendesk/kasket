@@ -1,0 +1,5 @@
+gem "activerecord", "~> 4.2.3"
+
+gemspec path: "../"
+
+eval_gemfile('gemfiles/common.rb')

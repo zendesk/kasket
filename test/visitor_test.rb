@@ -16,6 +16,7 @@ describe Kasket::Visitor do
       :index=>[:id],
       :key=>"#{Post.kasket_key_prefix}id=1"
     }
+
     assert_equal expected, Post.where(:id => 1).to_kasket_query
   end
 

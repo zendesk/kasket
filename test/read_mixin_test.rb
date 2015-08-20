@@ -5,11 +5,22 @@ describe Kasket::ReadMixin do
 
   describe "find by sql with kasket" do
     before do
-      @post_database_result = { 'id' => 1, 'title' => 'Hello' }
+      if ActiveRecord::VERSION::STRING >= '4.2.0'
+        @post_database_result = { 'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil, "poly_type" => nil, "created_at" => nil, "updated_at" => nil }
+        @comment_database_result = [
+          { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil },
+          { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil }
+        ]
+      else
+        @post_database_result = { 'id' => 1, 'title' => 'Hello' }
+        @comment_database_result = [
+          { 'id' => 1, 'body' => 'Hello'},
+          { 'id' => 2, 'body' => 'World'}
+        ]
+      end
+
       @post_records = [Post.send(:instantiate, @post_database_result)]
       Post.stubs(:find_by_sql_without_kasket).returns(@post_records)
-
-      @comment_database_result = [{ 'id' => 1, 'body' => 'Hello' }, { 'id' => 2, 'body' => 'World' }]
       @comment_records = @comment_database_result.map {|r| Comment.send(:instantiate, r)}
       Comment.stubs(:find_by_sql_without_kasket).returns(@comment_records)
     end
@@ -53,7 +64,9 @@ describe Kasket::ReadMixin do
         @sql = 'SELECT * FROM `posts` WHERE (id = 1)'
         @record = Post.find_by_sql(@sql).first
         assert_equal "asd", @record.title # read from cache ?
-        @record.instance_variable_get(:@attributes)['id'] = 3
+        attributes = @record.instance_variable_get(:@attributes)
+        attributes = attributes.send(:attributes).instance_variable_get(:@values) unless attributes.is_a?(Hash)
+        attributes['id'] = 3
       end
 
       it "not impact other queries" do

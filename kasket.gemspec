@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description = "puts a cap on your queries"
   s.license     = "Apache License Version 2.0"
 
-  s.add_runtime_dependency("activerecord", ">= 3.2", "< 4.2")
+  s.add_runtime_dependency("activerecord", ">= 3.2", "< 4.3")
 
   s.add_development_dependency("rake")
   s.add_development_dependency("bundler")

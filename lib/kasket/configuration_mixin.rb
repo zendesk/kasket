@@ -37,7 +37,12 @@ module Kasket
           column = columns_hash[attribute.to_s]
           value = nil if value.blank?
           quoted_value = if column
-            connection.quote(column.type_cast(value), column).downcase
+            casted_value = if column.respond_to?(:type_cast_for_database)
+              column.cast_type.send(:type_cast, value) # Rails 4.2 and up
+            else
+              column.type_cast(value)
+            end
+            connection.quote(casted_value).downcase
           else
             value.to_s
           end
