@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'bundler/gem_tasks'
+require 'bump/tasks'
 require 'wwtd/tasks'
 
 require 'rake/testtask'
