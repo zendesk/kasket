@@ -18,10 +18,8 @@ describe "configuration mixin" do
     end
 
     it "not generate keys longer that 255" do
-      very_large_number = (1..999).to_a.join
-      query_attributes  = [ [:blog_id, very_large_number] ]
-
-      assert(Post.kasket_key_for(query_attributes).size < 255)
+      Post.stubs(:quoted_value_for_column).returns((1..999).to_a.join.to_s)
+      assert(Post.kasket_key_for([:blog_id, 1]).size < 255)
     end
 
     it "not generate keys with spaces" do

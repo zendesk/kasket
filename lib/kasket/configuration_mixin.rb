@@ -36,17 +36,7 @@ module Kasket
         key = attribute_value_pairs.map do |attribute, value|
           column = columns_hash[attribute.to_s]
           value = nil if value.blank?
-          quoted_value = if column
-            casted_value = if column.respond_to?(:type_cast_for_database)
-              column.cast_type.send(:type_cast, value) # Rails 4.2 and up
-            else
-              column.type_cast(value)
-            end
-            connection.quote(casted_value).downcase
-          else
-            value.to_s
-          end
-          attribute.to_s << '=' << quoted_value
+          attribute.to_s << '=' << quoted_value_for_column(value, column)
         end.join('/')
 
         if key.size > (250 - kasket_key_prefix.size) || key =~ /\s/
@@ -87,6 +77,20 @@ module Kasket
       include WriteMixin unless include?(WriteMixin)
       extend DirtyMixin unless respond_to?(:kasket_dirty_methods)
       extend ReadMixin unless methods.map(&:to_sym).include?(:find_by_sql_with_kasket)
+    end
+
+    private
+    def quoted_value_for_column(value, column)
+      if column
+        casted_value = if column.respond_to?(:type_cast_for_database)
+          column.type_cast_for_database(value) # Rails 4.2 and up
+        else
+          column.type_cast(value)
+        end
+        connection.quote(casted_value).downcase
+      else
+        value.to_s
+      end
     end
   end
 end
