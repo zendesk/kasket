@@ -94,10 +94,6 @@ We have only used and tested Kasket on MySql.
 
 Let us know if you find any.
 
-== Requirements
-
-* ActiveRecord 2.3.x
-
 == Isn't this what Cache Money does?
 
 Absolutely, but cache money does so much more.
