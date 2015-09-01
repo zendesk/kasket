@@ -4,6 +4,7 @@ require 'minitest/rg'
 require 'mocha/setup'
 require 'active_record'
 require 'logger'
+require 'timecop'
 
 ENV['TZ'] = 'UTC'
 ActiveRecord::Base.time_zone_aware_attributes = true

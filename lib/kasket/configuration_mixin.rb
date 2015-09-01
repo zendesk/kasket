@@ -66,8 +66,8 @@ module Kasket
     end
 
     def has_kasket_on(*args)
-      attributes = args.sort! { |x, y| x.to_s <=> y.to_s }
-      if attributes != [:id] && !kasket_indices.include?([:id])
+      attributes = args.sort_by!(&:to_s)
+      if attributes != [:id] && !has_kasket_index_on?([:id])
         has_kasket_on(:id)
       end
 
@@ -79,7 +79,16 @@ module Kasket
       extend ReadMixin unless methods.map(&:to_sym).include?(:find_by_sql_with_kasket)
     end
 
+    def kasket_expires_in(time)
+      @kasket_expires_in = time
+    end
+
+    def _kasket_expires_in
+      @kasket_expires_in
+    end
+
     private
+
     def quoted_value_for_column(value, column)
       if column
         casted_value = if column.respond_to?(:type_cast_for_database)

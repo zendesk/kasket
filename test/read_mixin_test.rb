@@ -74,9 +74,7 @@ describe Kasket::ReadMixin do
 
         assert_not_equal @record, same_record
       end
-
     end
-
   end
 
   it "support serialized attributes" do
@@ -102,4 +100,14 @@ describe Kasket::ReadMixin do
     end
   end
 
+  it "expires the cache when the expires_in option is set" do
+    Rails.cache.clear
+    old = ExpiringComment.find(1).updated_at
+    ExpiringComment.where(id: 1).update_all(updated_at: Time.now + 10.seconds)
+    ExpiringComment.find(1).updated_at.must_equal old # caching works
+
+    Timecop.travel(Time.now + 6.minutes) do
+      ExpiringComment.find(1).updated_at.wont_equal old # cache expired
+    end
+  end
 end
