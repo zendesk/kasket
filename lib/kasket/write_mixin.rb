@@ -31,7 +31,7 @@ module Kasket
 
       def store_in_kasket(key = kasket_key)
         if kasket_cacheable? && key
-          options = { expires_in: self.class._kasket_expires_in } if self.class._kasket_expires_in
+          options = { expires_in: self.class.kasket_expires_in } if self.class.kasket_expires_in
           Kasket.cache.write(key, attributes_before_type_cast.dup, options)
           key
         end

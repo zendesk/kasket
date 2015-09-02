@@ -47,5 +47,5 @@ class ExpiringComment < ActiveRecord::Base
   self.table_name = 'comments'
 
   has_kasket
-  kasket_expires_in 5.minutes
+  has_kasket_expire_in 5.minutes
 end
