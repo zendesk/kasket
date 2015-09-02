@@ -79,11 +79,11 @@ module Kasket
       extend ReadMixin unless methods.map(&:to_sym).include?(:find_by_sql_with_kasket)
     end
 
-    def has_kasket_expire_in(time)
-      @kasket_expires_in = time
+    def kasket_expires_in(time)
+      @kasket_ttl = time
     end
 
-    attr_reader :kasket_expires_in
+    attr_reader :kasket_ttl
 
     private
 

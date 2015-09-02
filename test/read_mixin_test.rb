@@ -101,7 +101,6 @@ describe Kasket::ReadMixin do
   end
 
   it "expires the cache when the expires_in option is set" do
-    Rails.cache.clear
     old = ExpiringComment.find(1).updated_at
     ExpiringComment.where(id: 1).update_all(updated_at: Time.now + 10.seconds)
     ExpiringComment.find(1).updated_at.must_equal old # caching works
