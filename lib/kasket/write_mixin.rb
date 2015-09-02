@@ -29,9 +29,11 @@ module Kasket
         true
       end
 
-      def store_in_kasket
-        if kasket_cacheable? && kasket_key
-          Kasket.cache.write(kasket_key, @attributes.to_h.dup)
+      def store_in_kasket(key = kasket_key)
+        if kasket_cacheable? && key
+          options = { expires_in: self.class.kasket_ttl } if self.class.kasket_ttl
+          Kasket.cache.write(key, attributes_before_type_cast.dup, options)
+          key
         end
       end
 

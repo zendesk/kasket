@@ -42,3 +42,10 @@ class Blog < ActiveRecord::Base
   has_many :posts
   has_many :comments, :through => :posts
 end
+
+class ExpiringComment < ActiveRecord::Base
+  self.table_name = 'comments'
+
+  has_kasket
+  kasket_expires_in 5.minutes
+end

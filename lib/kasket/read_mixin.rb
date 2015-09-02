@@ -49,36 +49,28 @@ module Kasket
 
     protected
 
-      def missing_records_from_db(missing_keys)
-        return {} if missing_keys.empty?
+    def missing_records_from_db(missing_keys)
+      return {} if missing_keys.empty?
 
-        id_key_map = Hash[missing_keys.map{|key| [key.split('=').last.to_i, key] }]
+      id_key_map = Hash[missing_keys.map{|key| [key.split('=').last.to_i, key] }]
 
-        found = without_kasket { where(:id => id_key_map.keys).to_a }
-        found.each(&:store_in_kasket)
-        Hash[found.map{|record| [id_key_map[record.id], record] }]
-      end
+      found = without_kasket { where(:id => id_key_map.keys).to_a }
+      found.each(&:store_in_kasket)
+      Hash[found.map{|record| [id_key_map[record.id], record] }]
+    end
 
-      def store_in_kasket(key, records)
-        if records.size == 1
-          if records.first.kasket_cacheable?
-            Kasket.cache.write(key, records.first.attributes_before_type_cast.dup)
-          end
-        elsif records.empty?
-          ActiveRecord::Base.logger.info("[KASKET] would have stored an empty resultset") if ActiveRecord::Base.logger
-        elsif records.size <= Kasket::CONFIGURATION[:max_collection_size]
-          if records.all?(&:kasket_cacheable?)
-            instance_keys = records.map do |record|
-              instance_key = kasket_key_for_id(record.id)
-              Kasket.cache.write(instance_key, record.attributes_before_type_cast.dup)
-              instance_key
-            end
-
-            Kasket.cache.write(key, instance_keys) if key.is_a?(String)
-          end
+    def store_in_kasket(key, records)
+      if records.size == 1
+        records.first.store_in_kasket(key)
+      elsif records.empty?
+        ActiveRecord::Base.logger.info("[KASKET] would have stored an empty resultset") if ActiveRecord::Base.logger
+      elsif records.size <= Kasket::CONFIGURATION[:max_collection_size]
+        if records.all?(&:kasket_cacheable?)
+          instance_keys = records.map(&:store_in_kasket)
+          Kasket.cache.write(key, instance_keys)
         end
-        records
       end
-
+      records
+    end
   end
 end

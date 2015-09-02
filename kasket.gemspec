@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("bump")
   s.add_development_dependency("minitest")
   s.add_development_dependency("minitest-rg")
+  s.add_development_dependency("timecop")
 
   s.files        = Dir.glob("lib/**/*") + %w(README.rdoc)
 end
