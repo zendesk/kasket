@@ -49,3 +49,11 @@ class ExpiringComment < ActiveRecord::Base
   has_kasket
   kasket_expires_in 5.minutes
 end
+
+class DefaultComment < ActiveRecord::Base
+  self.table_name = 'comments'
+
+  default_scope { where(public: true) }
+
+  has_kasket_on :public, :id
+end

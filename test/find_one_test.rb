@@ -20,7 +20,8 @@ describe "find one" do
     Post.where(:blog_id => 2).find_by_id 1
 
     Kasket.cache.expects(:read).never
-    Post.where(:blog_id => 2).first
+    Post.where(:blog_id => 2).first # partially indexed
+    Post.where(:updated_at => Time.at(0)).find_by_id(1) # partially indexed
   end
 
   it "not use cache when using the :select option" do
@@ -59,5 +60,13 @@ describe "find one" do
     post = blog.posts.find(post.id)
     key  = post.kasket_key.sub(%r{(/id=#{post.id})}, "/blog_id=#{Blog.first.id}\\1")
     assert(Kasket.cache.read(key))
+  end
+
+  it "uses different caches when being unscoped" do
+    DefaultComment.find(1) # put it into cache
+    DefaultComment.where(id: 1).update_all(public: false) # simulate db changing
+
+    assert DefaultComment.find(1).public # read from old cache
+    DefaultComment.unscoped { refute DefaultComment.find(1).public } # read from different cache -> correct value
   end
 end

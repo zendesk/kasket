@@ -8,8 +8,8 @@ describe Kasket::ReadMixin do
       if ActiveRecord::VERSION::STRING >= '4.2.0'
         @post_database_result = { 'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil, "poly_type" => nil, "created_at" => nil, "updated_at" => nil }
         @comment_database_result = [
-          { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil },
-          { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil }
+          { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil , "public" => nil},
+          { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil , "public" => nil }
         ]
       else
         @post_database_result = { 'id' => 1, 'title' => 'Hello' }
