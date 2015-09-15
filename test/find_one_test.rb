@@ -14,6 +14,18 @@ describe "find one" do
     assert_equal(post, Post.find(post.id))
   end
 
+  it "caches where with 1 id" do
+    Post.find(1)
+    Post.expects(:find_by_sql_without_kasket).never
+    assert_equal(1, Post.where(id: [1]).first.id)
+  end
+
+  it "caches where with 1 id and other attribute" do
+    Post.where(blog_id: blogs(:a_blog).id).find(1)
+    Post.expects(:find_by_sql_without_kasket).never
+    assert_equal(1, Post.where(blog_id: blogs(:a_blog).id, id: [1]).first.id)
+  end
+
   it "only cache on indexed attributes" do
     Kasket.cache.expects(:read).twice
     Post.find_by_id(1)

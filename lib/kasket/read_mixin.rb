@@ -10,11 +10,11 @@ module Kasket
     def find_by_sql_with_kasket(*args)
       sql = args[0]
 
-      if use_kasket?
+      query = if use_kasket?
         if sql.respond_to?(:to_kasket_query)
-          query = sql.to_kasket_query(self, args[1])
+          sql.to_kasket_query(self, args[1])
         else
-          query = kasket_parser.parse(sanitize_sql(sql))
+          kasket_parser.parse(sanitize_sql(sql))
         end
       end
 

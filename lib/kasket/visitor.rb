@@ -29,7 +29,7 @@ module Kasket
       return :unsupported if node.with
       return :unsupported if node.offset
       return :unsupported if node.lock
-      return :unsupported if node.orders.any?
+      return :unsupported if !default_sql_order?(node)
       return :unsupported if node.cores.size != 1
 
       query = visit_Arel_Nodes_SelectCore(node.cores[0])
@@ -123,6 +123,18 @@ module Kasket
     #TODO: We are actually not using this?
     def quoted(node)
       @model_class.connection.quote(node, self.last_column)
+    end
+
+    private
+
+    def default_sql_order?(node)
+      return true if node.orders.empty?
+      return false if node.orders.size > 1
+
+      # check if the given order is the default `table.id ASC` order
+      default = "`#{@model_class.table_name}`.`#{@model_class.primary_key}` ASC"
+      given = (node.orders.first.respond_to?(:to_sql) ? node.orders.first.to_sql : node.orders.first.to_s)
+      given == default
     end
 
     alias :visit_String                :literal
