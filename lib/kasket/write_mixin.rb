@@ -64,9 +64,15 @@ module Kasket
         end
       end
 
-      def reload_with_kasket_clearing(*args)
+      def reload(*args)
         Kasket.clear_local
-        reload_without_kasket_clearing(*args)
+        super
+      end
+
+      def update_column(*args)
+        result = super
+        clear_kasket_indices
+        result
       end
     end
 
@@ -81,9 +87,6 @@ module Kasket
       model_class.after_save :clear_kasket_indices
       model_class.after_touch :clear_kasket_indices
       model_class.after_destroy :clear_kasket_indices
-
-      model_class.alias_method_chain :reload, :kasket_clearing
-
 
       class << model_class
         alias_method_chain :transaction, :kasket_disabled

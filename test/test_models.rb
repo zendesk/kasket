@@ -35,7 +35,11 @@ class Post < ActiveRecord::Base
     self.class.connection.execute("UPDATE posts SET updated_at = '#{updated_at.utc.to_s(:db)}' WHERE id = #{id}")
   end
 
-  kasket_dirty_methods :make_dirty!
+  def method_with_block
+    yield
+  end
+
+  kasket_dirty_methods :make_dirty!, :method_with_block
 end
 
 class Blog < ActiveRecord::Base
