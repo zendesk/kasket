@@ -37,6 +37,11 @@ describe "cache expiry" do
       assert_nil(Kasket.cache.read(@post.kasket_key))
     end
 
+    it "loads a fresh copy when reload is called" do
+      Post.where(id: @post.id).update_all(title: 'sneaky')
+      @post.reload.title.must_equal 'sneaky'
+    end
+
     it "clears all indices for instance when updated" do
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "id=#{@post.id}")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'")

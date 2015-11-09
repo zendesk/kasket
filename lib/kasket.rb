@@ -9,7 +9,6 @@ module Kasket
   autoload :DirtyMixin,             'kasket/dirty_mixin'
   autoload :QueryParser,            'kasket/query_parser'
   autoload :ConfigurationMixin,     'kasket/configuration_mixin'
-  autoload :ReloadAssociationMixin, 'kasket/reload_association_mixin'
   autoload :Query,                  'kasket/query'
   autoload :Visitor,                'kasket/visitor'
   autoload :SelectManagerMixin,     'kasket/select_manager_mixin'
@@ -30,11 +29,6 @@ module Kasket
       ActiveRecord::Relation.send(:include, Kasket::RelationMixin)
       Arel::SelectManager.send(:include, Kasket::SelectManagerMixin)
     end
-
-    if options[:assoliations_reload_hack]
-      ActiveRecord::Associations::BelongsToAssociation.send(:include, Kasket::ReloadAssociationMixin)
-      ActiveRecord::Associations::HasOneThroughAssociation.send(:include, Kasket::ReloadAssociationMixin)
-    end
   end
 
   def self.cache_store=(options)
@@ -43,11 +37,5 @@ module Kasket
 
   def self.cache
     @cache_store ||= Rails.cache
-  end
-
-  def clear_local
-    if Kasket.cache.respond_to?(:with_local_cache)
-      Kasket.cache.send(:local_cache).try(:clear)
-    end
   end
 end

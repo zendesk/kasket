@@ -65,7 +65,7 @@ module Kasket
       end
 
       def reload(*args)
-        Kasket.clear_local
+        clear_kasket_indices
         super
       end
 
