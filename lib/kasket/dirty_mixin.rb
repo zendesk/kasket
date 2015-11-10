@@ -2,13 +2,14 @@ module Kasket
   module DirtyMixin
     def kasket_dirty_methods(*method_names)
       method_names.each do |method|
-        unless method_defined?("without_kasket_update_#{method}")
-          alias_method("without_kasket_update_#{method}", method)
-          define_method(method) do |*args|
-            result = send("without_kasket_update_#{method}", *args)
-            clear_kasket_indices
-            result
-          end
+        without = "without_kasket_update_#{method}"
+        return if method_defined? without
+
+        alias_method without, method
+        define_method method do |*args, &block|
+          result = send(without, *args, &block)
+          clear_kasket_indices
+          result
         end
       end
     end
