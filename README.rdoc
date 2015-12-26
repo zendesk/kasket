@@ -1,6 +1,6 @@
 = Kasket {<img src="https://secure.travis-ci.org/zendesk/kasket.png" />}[http://travis-ci.org/zendesk/kasket]
 === Puts a cap on your queries
-A caching layer for ActiveRecord (2.3.x and 3.1.x)
+A caching layer for ActiveRecord (3.x and 4.x)
 
 Developed and used on http://zendesk.com.
 
@@ -23,13 +23,13 @@ You can configure exactly what models to cache and what type of queries to cache
 
 == Setting up Kasket
 
-Kasket is set up by simply calling Kasket.setup in an initializer script.
-This will include the required modules into the ActiveRecord
+Kasket is set up by simply calling `Kasket.setup` in an initializer script.
+This will include the required modules into ActiveRecord.
 
 === Options
 
 By default, Kasket will cache instance collection with a maximum length of 100.
-You can everride this by passing the :max_collection_size option to the Kasket.setup call:
+You can override this by passing the `:max_collection_size` option to the `Kasket.setup` call:
 
   Kasket.setup(:max_collection_size => 50)
 
@@ -38,21 +38,21 @@ You can everride this by passing the :max_collection_size option to the Kasket.s
 You can configure Kasket for any ActiveRecord model, and subclasses will automatically inherit the caching
 configuration.
 
-If you have an Account model, you can can do the simplest caching configuration like:
+If you have an `Account` model, you can can do the simplest caching configuration like:
 
   Account.has_kasket
 
 This will add a caching index on the id attribute of the Account model,
-and will make sure that all your calls like Account.find(1) and Account.find_by_id(1) will be cached.
-All other calls ( say Account.find_by_subdomain('zendesk') ) are untouched.
+and will make sure that all your calls like `Account.find(1)` and `Account.find_by_id(1)` will be cached.
+All other calls (say, `Account.find_by_subdomain('zendesk')`) are untouched.
 
 If you wanted to configure a caching index on the subdomain attribute of the Account model, you would simply write
 
   Account.has_kasket_on :subdomain
 
 This would add caching to calls like:
-* Account.find_by_subdomain('zendesk')
-* Account.find_all_by_subdomain('zendesk')
+* `Account.find_by_subdomain('zendesk')`
+* `Account.find_all_by_subdomain('zendesk')`
 
 and all other ways of expressing lookups on subdomain.
 
@@ -71,7 +71,7 @@ When you save a model instance, Kasket will calculate the cache entries to expir
 === Cache expiry on database schema changes
 
 All Kasket cache keys contain a hash of the column names of the table associated with the model.
-If you somehow change your table schema, all cache entries for that table will automatically expire
+If you somehow change your table schema, all cache entries for that table will automatically expire.
 
 === Cache expiry on Kasket upgrades
 
@@ -80,35 +80,34 @@ All Kasket cache keys contain the Kasket version number, so upgrading Kasket wil
 === Manually expiring caches
 
 If you have model methods that update the database behind the back of ActiveRecord, you need to mark these methods
-as beeing dirty.
+as being dirty.
 
   Account.kasket_dirty_methods :update_last_action
 
-This will make sure the clear the cache entries for the current instance when you call update_last_action
+This will make sure the clear the cache entries for the current instance when you call `update_last_action`.
 
 == How does this work?
 
 == Known issues
 
-We have only used and tested Kasket on MySql.
+We have only used and tested Kasket with MySQL.
 
 Let us know if you find any.
 
 == Isn't this what Cache Money does?
 
-Absolutely, but cache money does so much more.
-
-* Cache Money has way more features than what we need
-* The Cache Money code is overly complex
-* Cache Money seems abandoned
+Absolutely, but [Cache Money](https://github.com/nkallen/cache-money) does so much more.
+* Cache Money has way more features than what we need.
+* The Cache Money code is overly complex.
+* Cache Money seems abandoned.
 
 == Note on Patches/Pull Requests
 
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
+* Commit, do not mess with Rakefile, version, or history.
+  (If you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull.)
 * Send me a pull request. Bonus points for topic branches.
 
 == Copyright and license
