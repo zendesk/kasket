@@ -3,8 +3,8 @@ require './lib/kasket/version'
 Gem::Specification.new do |s|
   s.name        = "kasket"
   s.version     = Kasket::Version::STRING
-  s.authors     = ["Mick Staugaard",   "Eric Chapweske"]
-  s.email       = ["mick@zendesk.com", "eac@zendesk.com"]
+  s.authors     = ["Mick Staugaard", "Eric Chapweske"]
+  s.email       = ["mick@zendesk.com"]
   s.homepage    = "http://github.com/zendesk/kasket"
   s.summary     = "A write back caching layer on active record"
   s.description = "puts a cap on your queries"
@@ -20,5 +20,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency("minitest-rg")
   s.add_development_dependency("timecop")
 
-  s.files        = Dir.glob("lib/**/*") + %w(README.rdoc)
+  s.files        = Dir.glob("lib/**/*") + %w(README.md)
 end
