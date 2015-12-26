@@ -1,19 +1,20 @@
-= Kasket {<img src="https://secure.travis-ci.org/zendesk/kasket.png" />}[http://travis-ci.org/zendesk/kasket]
-=== Puts a cap on your queries
+# Kasket [![Build Status](https://secure.travis-ci.org/zendesk/kasket.svg)](http://travis-ci.org/zendesk/kasket)
+
+### Puts a cap on your queries
 A caching layer for ActiveRecord (3.x and 4.x)
 
 Developed and used on http://zendesk.com.
 
-== Sponsored by Zendesk - Enlightened Customer Support
+## Sponsored by Zendesk - Enlightened Customer Support
 
-== Description
+## Description
 
 Kasket is a safe way to cache your database queries in memcached.
 Designed to be as small and simple as possible, and to get out of the way when it is not safe to cache.
 
 You can configure exactly what models to cache and what type of queries to cache.
 
-=== Features
+### Features
 
 * Declarative configuration
 * Collection caching as well as caching of single instances
@@ -21,26 +22,30 @@ You can configure exactly what models to cache and what type of queries to cache
 * Automatic cache expiry in Kasket udates
 * Very small code base
 
-== Setting up Kasket
+## Setting up Kasket
 
 Kasket is set up by simply calling `Kasket.setup` in an initializer script.
 This will include the required modules into ActiveRecord.
 
-=== Options
+### Options
 
 By default, Kasket will cache instance collection with a maximum length of 100.
 You can override this by passing the `:max_collection_size` option to the `Kasket.setup` call:
 
-  Kasket.setup(:max_collection_size => 50)
+```
+Kasket.setup(:max_collection_size => 50)
+```
 
-== Configuring caching of your models
+## Configuring caching of your models
 
 You can configure Kasket for any ActiveRecord model, and subclasses will automatically inherit the caching
 configuration.
 
 If you have an `Account` model, you can can do the simplest caching configuration like:
 
-  Account.has_kasket
+```
+Account.has_kasket
+```
 
 This will add a caching index on the id attribute of the Account model,
 and will make sure that all your calls like `Account.find(1)` and `Account.find_by_id(1)` will be cached.
@@ -48,7 +53,9 @@ All other calls (say, `Account.find_by_subdomain('zendesk')`) are untouched.
 
 If you wanted to configure a caching index on the subdomain attribute of the Account model, you would simply write
 
-  Account.has_kasket_on :subdomain
+```
+Account.has_kasket_on :subdomain
+```
 
 This would add caching to calls like:
 * `Account.find_by_subdomain('zendesk')`
@@ -56,7 +63,7 @@ This would add caching to calls like:
 
 and all other ways of expressing lookups on subdomain.
 
-== Cache expiry
+## Cache expiry
 
 The goal of Kasket is to be as safe as possible to use, so the cache is expired in a number of situations
 * When you save a model instance
@@ -64,44 +71,46 @@ The goal of Kasket is to be as safe as possible to use, so the cache is expired 
 * When you install a new version of Kasket
 * When you ask it to
 
-=== Cahce expiry on instance save
+### Cache expiry on instance save
 
 When you save a model instance, Kasket will calculate the cache entries to expire.
 
-=== Cache expiry on database schema changes
+### Cache expiry on database schema changes
 
 All Kasket cache keys contain a hash of the column names of the table associated with the model.
 If you somehow change your table schema, all cache entries for that table will automatically expire.
 
-=== Cache expiry on Kasket upgrades
+### Cache expiry on Kasket upgrades
 
 All Kasket cache keys contain the Kasket version number, so upgrading Kasket will expire all Kasket cache entries.
 
-=== Manually expiring caches
+### Manually expiring caches
 
 If you have model methods that update the database behind the back of ActiveRecord, you need to mark these methods
 as being dirty.
 
-  Account.kasket_dirty_methods :update_last_action
+```
+Account.kasket_dirty_methods :update_last_action
+```
 
 This will make sure the clear the cache entries for the current instance when you call `update_last_action`.
 
-== How does this work?
+## How does this work?
 
-== Known issues
+## Known issues
 
 We have only used and tested Kasket with MySQL.
 
 Let us know if you find any.
 
-== Isn't this what Cache Money does?
+## Isn't this what Cache Money does?
 
-Absolutely, but [Cache Money](https://github.com/nkallen/cache-money) does so much more.
+Absolutely, but Cache Money does so much more.
 * Cache Money has way more features than what we need.
 * The Cache Money code is overly complex.
 * Cache Money seems abandoned.
 
-== Note on Patches/Pull Requests
+## Note on Patches/Pull Requests
 
 * Fork the project.
 * Make your feature addition or bug fix.
@@ -110,7 +119,7 @@ Absolutely, but [Cache Money](https://github.com/nkallen/cache-money) does so mu
   (If you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull.)
 * Send me a pull request. Bonus points for topic branches.
 
-== Copyright and license
+## Copyright and license
 
 Copyright 2013 Zendesk
 
