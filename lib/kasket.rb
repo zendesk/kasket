@@ -14,7 +14,7 @@ module Kasket
   autoload :SelectManagerMixin,     'kasket/select_manager_mixin'
   autoload :RelationMixin,          'kasket/relation_mixin'
 
-  CONFIGURATION = {:max_collection_size => 100}
+  CONFIGURATION = {:max_collection_size => 100, :write_through => false}
 
   module_function
 
@@ -22,6 +22,7 @@ module Kasket
     return if ActiveRecord::Base.respond_to?(:has_kasket)
 
     CONFIGURATION[:max_collection_size] = options[:max_collection_size] if options[:max_collection_size]
+    CONFIGURATION[:write_through] = options[:write_through] if options[:write_through]
 
     ActiveRecord::Base.extend(Kasket::ConfigurationMixin)
 

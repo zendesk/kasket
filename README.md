@@ -3,7 +3,7 @@
 ### Puts a cap on your queries
 A caching layer for ActiveRecord (3.x and 4.x)
 
-Developed and used on http://zendesk.com.
+Developed and used by [Zendesk](http://zendesk.com).
 
 ## Sponsored by Zendesk - Enlightened Customer Support
 
@@ -29,11 +29,23 @@ This will include the required modules into ActiveRecord.
 
 ### Options
 
-By default, Kasket will cache instance collection with a maximum length of 100.
+#### Max Collection Size
+
+By default, Kasket will cache each instance collection with a maximum length of 100.
 You can override this by passing the `:max_collection_size` option to the `Kasket.setup` call:
 
 ```
 Kasket.setup(:max_collection_size => 50)
+```
+
+#### Write-Through Caching
+
+By default, when a model is saved, Kasket will invalidate cache entries by deleting them.
+You can pass ':write_through => true' to the `Kasket.setup` call to get write-through cache
+semantics instead. In this mode, the model will be updated in the cache as well as the database.
+
+```
+Kasket.setup(:write_through => true)
 ```
 
 ## Configuring caching of your models
@@ -65,7 +77,7 @@ and all other ways of expressing lookups on subdomain.
 
 ## Cache expiry
 
-The goal of Kasket is to be as safe as possible to use, so the cache is expired in a number of situations
+The goal of Kasket is to be as safe as possible to use, so the cache is expired in a number of situations:
 * When you save a model instance
 * When your database schema changes
 * When you install a new version of Kasket
@@ -103,7 +115,7 @@ We have only used and tested Kasket with MySQL.
 
 Let us know if you find any.
 
-## Isn't this what Cache Money does?
+## Isn't this what [Cache Money](https://github.com/nkallen/cache-money) does?
 
 Absolutely, but Cache Money does so much more.
 * Cache Money has way more features than what we need.

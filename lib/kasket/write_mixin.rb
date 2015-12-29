@@ -58,6 +58,17 @@ module Kasket
         keys
       end
 
+      def update_kasket_entries
+        if Kasket::CONFIGURATION[:write_through]
+          primary_kasket_key = store_in_kasket
+          kasket_keys.each do |key|
+            Kasket.cache.delete(key) if key != primary_kasket_key
+          end
+        else
+          clear_kasket_indices
+        end
+      end
+
       def clear_kasket_indices
         kasket_keys.each do |key|
           Kasket.cache.delete(key)
@@ -84,8 +95,8 @@ module Kasket
         model_class.send(:alias_method, :kasket_cacheable?, :default_kasket_cacheable?)
       end
 
-      model_class.after_save :clear_kasket_indices
-      model_class.after_touch :clear_kasket_indices
+      model_class.after_save :update_kasket_entries
+      model_class.after_touch :update_kasket_entries
       model_class.after_destroy :clear_kasket_indices
 
       class << model_class
