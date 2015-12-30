@@ -99,7 +99,7 @@ module Kasket
 
       model_class.after_commit :kasket_after_commit
 
-      if ActiveRecord::VERSION::MAJOR == 3
+      if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)
         model_class.after_touch :kasket_after_commit
       end
 
