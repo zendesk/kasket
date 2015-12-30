@@ -40,8 +40,8 @@ module Kasket
       def kasket_keys
         attribute_sets = [attributes.symbolize_keys]
 
-        if changed?
-          old_attributes = Hash[*changes.map {|attribute, values| [attribute, values[0]]}.flatten].symbolize_keys
+        if previous_changes.present?
+          old_attributes = Hash[*previous_changes.map {|attribute, values| [attribute, values[0]]}.flatten].symbolize_keys
           attribute_sets << old_attributes.reverse_merge(attribute_sets[0])
         end
 
@@ -58,25 +58,17 @@ module Kasket
         keys
       end
 
-      def kasket_after_save
-        @kasket_keys = kasket_keys
-      end
-
       def kasket_after_commit
-        @kasket_keys ||= kasket_keys
+        keys = kasket_keys
+
         if persisted? && Kasket::CONFIGURATION[:write_through]
           key = store_in_kasket
-          @kasket_keys.delete(key)
+          keys.delete(key)
         end
-        @kasket_keys.each do |key|
+
+        keys.each do |key|
           Kasket.cache.delete(key)
         end
-      ensure
-        @kasket_keys = nil
-      end
-
-      def kasket_after_rollback
-        @kasket_keys = nil
       end
 
       def clear_kasket_indices
@@ -105,9 +97,11 @@ module Kasket
         model_class.send(:alias_method, :kasket_cacheable?, :default_kasket_cacheable?)
       end
 
-      model_class.after_save :kasket_after_save
       model_class.after_commit :kasket_after_commit
-      model_class.after_rollback :kasket_after_rollback
+
+      if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)
+        model_class.after_touch :kasket_after_commit
+      end
 
       class << model_class
         alias_method_chain :transaction, :kasket_disabled

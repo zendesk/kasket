@@ -21,9 +21,6 @@ describe "dirty" do
   it "clears the indices when touch is called" do
     assert_cleared do |p|
       p.touch
-
-      # Kludge - in test, after_commit callback runs too late.
-      p.save if ActiveRecord::VERSION::MAJOR == 3
     end
   end
 
