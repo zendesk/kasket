@@ -62,13 +62,9 @@ module Kasket
         @kasket_keys = kasket_keys
       end
 
-      def kasket_after_commit_create
-        kasket_after_commit_update
-      end
-
-      def kasket_after_commit_update
+      def kasket_after_commit
         @kasket_keys ||= kasket_keys
-        if Kasket::CONFIGURATION[:write_through]
+        if persisted? && Kasket::CONFIGURATION[:write_through]
           key = store_in_kasket
           @kasket_keys.delete(key)
         end
@@ -77,10 +73,6 @@ module Kasket
         end
       ensure
         @kasket_keys = nil
-      end
-
-      def kasket_after_commit_destroy
-        clear_kasket_indices
       end
 
       def clear_kasket_indices
@@ -110,9 +102,7 @@ module Kasket
       end
 
       model_class.after_save :kasket_after_save
-      model_class.after_commit :kasket_after_commit_create, :on => :create
-      model_class.after_commit :kasket_after_commit_update, :on => :update
-      model_class.after_commit :kasket_after_commit_destroy, :on => :destroy
+      model_class.after_commit :kasket_after_commit
 
       class << model_class
         alias_method_chain :transaction, :kasket_disabled
