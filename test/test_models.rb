@@ -3,7 +3,7 @@ ActiveRecord::Base.configurations = YAML::load(IO.read(File.expand_path("databas
 config = ActiveRecord::Base.configurations['test']
 
 ActiveRecord::Base.establish_connection(config.merge('database' => nil))
-ActiveRecord::Base.connection.create_database(config['database'], config.merge(force: true))
+ActiveRecord::Base.connection.recreate_database(config['database'], config)
 ActiveRecord::Base.establish_connection(:test)
 
 load(File.dirname(__FILE__) + "/schema.rb")
