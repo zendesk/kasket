@@ -75,6 +75,10 @@ module Kasket
         @kasket_keys = nil
       end
 
+      def kasket_after_rollback
+        @kasket_keys = nil
+      end
+
       def clear_kasket_indices
         kasket_keys.each do |key|
           Kasket.cache.delete(key)
@@ -103,6 +107,7 @@ module Kasket
 
       model_class.after_save :kasket_after_save
       model_class.after_commit :kasket_after_commit
+      model_class.after_rollback :kasket_after_rollback
 
       class << model_class
         alias_method_chain :transaction, :kasket_disabled
