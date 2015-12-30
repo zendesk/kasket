@@ -98,6 +98,7 @@ module Kasket
       end
 
       model_class.after_commit :kasket_after_commit
+      model_class.after_touch :kasket_after_commit
 
       class << model_class
         alias_method_chain :transaction, :kasket_disabled
