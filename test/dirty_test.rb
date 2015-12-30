@@ -18,8 +18,13 @@ describe "dirty" do
     assert_cleared { |p| p.make_dirty! }
   end
 
-  it "clear the indices when a touch is called" do
-    assert_cleared { |p| p.touch }
+  it "clears the indices when touch is called" do
+    assert_cleared do |p|
+      p.touch
+
+      # Kludge - in test, after_commit callback runs too late.
+      p.save if ActiveRecord::VERSION::MAJOR == 3
+    end
   end
 
   it "clear the indices when update_column is called" do

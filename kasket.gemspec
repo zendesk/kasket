@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency("minitest")
   s.add_development_dependency("minitest-rg")
   s.add_development_dependency("timecop")
+  s.add_development_dependency("test_after_commit")
 
   s.files        = Dir.glob("lib/**/*") + %w(README.md)
 end

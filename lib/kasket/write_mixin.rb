@@ -58,15 +58,29 @@ module Kasket
         keys
       end
 
-      def update_kasket_entries
+      def kasket_after_save
+        @kasket_keys = kasket_keys
+      end
+
+      def kasket_after_commit_create
+        kasket_after_commit_update
+      end
+
+      def kasket_after_commit_update
+        @kasket_keys ||= kasket_keys
         if Kasket::CONFIGURATION[:write_through]
-          primary_kasket_key = store_in_kasket
-          kasket_keys.each do |key|
-            Kasket.cache.delete(key) if key != primary_kasket_key
-          end
-        else
-          clear_kasket_indices
+          key = store_in_kasket
+          @kasket_keys.delete(key)
         end
+        @kasket_keys.each do |key|
+          Kasket.cache.delete(key)
+        end
+      ensure
+        @kasket_keys = nil
+      end
+
+      def kasket_after_commit_destroy
+        clear_kasket_indices
       end
 
       def clear_kasket_indices
@@ -95,9 +109,10 @@ module Kasket
         model_class.send(:alias_method, :kasket_cacheable?, :default_kasket_cacheable?)
       end
 
-      model_class.after_save :update_kasket_entries
-      model_class.after_touch :update_kasket_entries
-      model_class.after_destroy :clear_kasket_indices
+      model_class.after_save :kasket_after_save
+      model_class.after_commit :kasket_after_commit_create, :on => :create
+      model_class.after_commit :kasket_after_commit_update, :on => :update
+      model_class.after_commit :kasket_after_commit_destroy, :on => :destroy
 
       class << model_class
         alias_method_chain :transaction, :kasket_disabled
