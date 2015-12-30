@@ -98,7 +98,10 @@ module Kasket
       end
 
       model_class.after_commit :kasket_after_commit
-      model_class.after_touch :kasket_after_commit
+
+      if ActiveRecord::VERSION::MAJOR == 3
+        model_class.after_touch :kasket_after_commit
+      end
 
       class << model_class
         alias_method_chain :transaction, :kasket_disabled
