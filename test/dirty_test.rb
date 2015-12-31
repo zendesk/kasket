@@ -19,9 +19,7 @@ describe "dirty" do
   end
 
   it "clears the indices when touch is called" do
-    assert_cleared do |p|
-      p.touch
-    end
+    assert_cleared { |p| p.touch }
   end
 
   it "clear the indices when update_column is called" do
