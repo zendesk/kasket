@@ -54,5 +54,39 @@ describe "cache expiry" do
       @post.title = "new_title"
       @post.save
     end
+
+    describe "when :write_through is true" do
+      before do
+        Kasket::CONFIGURATION[:write_through] = true
+      end
+
+      it "is updated in cache when updated" do
+        @post.title = "new_title"
+        @post.save
+        assert_equal @post.attributes, Kasket.cache.read(@post.kasket_key)
+      end
+
+      it "is updated in cache when touched" do
+        @post.touch
+        assert_equal @post.attributes, Kasket.cache.read(@post.kasket_key)
+      end
+
+      it "writes id key and clears indices for instance when updated" do
+        Kasket.cache.expects(:write).with(Post.kasket_key_prefix + "id=#{@post.id}", anything, nil)
+        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'")
+        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'/first")
+        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'")
+        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'/first")
+        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "blog_id=#{@post.blog_id}/id=#{@post.id}")
+        Kasket.cache.expects(:delete).never
+
+        @post.title = "new_title"
+        @post.save
+      end
+
+      after do
+        Kasket::CONFIGURATION[:write_through] = false
+      end
+    end
   end
 end

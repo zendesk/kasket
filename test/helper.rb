@@ -5,15 +5,22 @@ require 'mocha/setup'
 require 'active_record'
 require 'logger'
 require 'timecop'
+require 'test_after_commit'
 
 ENV['TZ'] = 'UTC'
 ActiveRecord::Base.time_zone_aware_attributes = true
 ActiveRecord::Base.logger = Logger.new(StringIO.new)
 
+if ActiveRecord::Base.respond_to?(:raise_in_transactional_callbacks)
+  ActiveRecord::Base.raise_in_transactional_callbacks = true
+end
+
 require 'active_record/fixtures'
 require 'kasket'
 
 Kasket.setup
+
+TestAfterCommit.enabled = true
 
 ActiveSupport.test_order = :random if ActiveSupport.respond_to?(:test_order=)
 

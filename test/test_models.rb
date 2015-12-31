@@ -1,9 +1,11 @@
 ActiveRecord::Base.configurations = YAML::load(IO.read(File.expand_path("database.yml", File.dirname(__FILE__))))
 
-conf = ActiveRecord::Base.configurations['test']
-`echo "drop DATABASE if exists #{conf['database']}" | mysql --user=#{conf['username']}`
-`echo "create DATABASE #{conf['database']} DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci" | mysql --user=#{conf['username']}`
+config = ActiveRecord::Base.configurations['test']
+
+ActiveRecord::Base.establish_connection(config.merge('database' => nil))
+ActiveRecord::Base.connection.recreate_database(config['database'], config)
 ActiveRecord::Base.establish_connection(:test)
+
 load(File.dirname(__FILE__) + "/schema.rb")
 
 class Comment < ActiveRecord::Base

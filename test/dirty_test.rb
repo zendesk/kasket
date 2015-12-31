@@ -18,7 +18,7 @@ describe "dirty" do
     assert_cleared { |p| p.make_dirty! }
   end
 
-  it "clear the indices when a touch is called" do
+  it "clears the indices when touch is called" do
     assert_cleared { |p| p.touch }
   end
 
