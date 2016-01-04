@@ -92,21 +92,9 @@ module Kasket
         # This is here to force committed! to be invoked.
       end
 
-      if ActiveRecord::VERSION::MAJOR > 4
-        def committed!(should_run_callbacks: true)
-          kasket_after_commit if should_run_callbacks && persisted? || destroyed?
-          super
-        end
-      elsif ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR >= 2
-        def committed!(should_run_callbacks = true)
-          kasket_after_commit if should_run_callbacks && persisted? || destroyed?
-          super
-        end
-      else
-        def committed!
-          kasket_after_commit if persisted? || destroyed?
-          super
-        end
+      def committed!(*)
+        kasket_after_commit if persisted? || destroyed?
+        super
       end
     end
 
