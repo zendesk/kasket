@@ -55,6 +55,61 @@ describe "cache expiry" do
       @post.save
     end
 
+    describe "between after_save and after_commit" do
+      it "blacklists the cache keys" do
+        Post.transaction do
+          @post.title = "new_title"
+          keys = @post.kasket_keys
+          @post.save
+          Kasket.cache.send(:blacklist).must_equal Set.new(keys)
+        end
+      end
+
+      it "clears the blacklist after commit" do
+        Post.transaction do
+          @post.title = "new_title"
+          @post.save
+        end
+        Kasket.cache.send(:blacklist).must_equal Set.new
+      end
+
+      it "clears the blacklist after rollback" do
+        Post.transaction do
+          @post.title = "new_title"
+          @post.save
+          raise ActiveRecord::Rollback
+        end
+        Kasket.cache.send(:blacklist).must_equal Set.new
+      end
+
+      it "blocks Kasket.cache.read of blacklisted keys" do
+        Rails.cache.expects(:read).never
+        Post.transaction do
+          @post.title = "new_title"
+          @post.save
+          assert_nil Kasket.cache.read(@post.kasket_key)
+        end
+      end
+
+      it "blocks Kasket.cache.read_multi with blacklisted keys" do
+        Rails.cache.expects(:read_multi).with().returns({})
+        Post.transaction do
+          @post.title = "new_title"
+          @post.save
+          assert_equal ({}), Kasket.cache.read_multi(@post.kasket_key)
+        end
+      end
+
+      it "blocks Kasket.cache.write to blacklisted keys" do
+        Rails.cache.expects(:write).never
+        Post.transaction do
+          @post.title = "new_title"
+          @post.save
+          Kasket.cache.write(@post.kasket_key, "foo")
+        end
+      end
+    end
+
     describe "when :write_through is true" do
       before do
         Kasket::CONFIGURATION[:write_through] = true
