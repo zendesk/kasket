@@ -95,7 +95,11 @@ module Kasket
       end
 
       def kasket_after_save
-        Kasket.add_pending_record(self)
+        Kasket.add_pending_record(self, self)
+      end
+
+      def kasket_after_destroy
+        Kasket.add_pending_record(self, nil)
       end
 
       def committed!(*)
@@ -119,6 +123,7 @@ module Kasket
       end
 
       model_class.after_save :kasket_after_save
+      model_class.after_destroy :kasket_after_destroy
       model_class.after_commit :kasket_after_commit_dummy
 
       if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)

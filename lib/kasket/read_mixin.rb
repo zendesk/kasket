@@ -50,8 +50,8 @@ module Kasket
     protected
 
     def filter_pending_records(records)
-      if pending_map = Kasket.pending_map
-        records.map { |record| pending_map[record] || record }
+      if pending_records = Kasket.pending_records
+        records.map { |record| pending_records.fetch(record, record) }.compact
       else
         records
       end
