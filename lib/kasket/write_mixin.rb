@@ -87,6 +87,15 @@ module Kasket
         clear_kasket_indices
         result
       end
+
+      def kasket_after_commit_dummy
+        # This is here to force committed! to be invoked.
+      end
+
+      def committed!(*)
+        kasket_after_commit if persisted? || destroyed?
+        super
+      end
     end
 
     def self.included(model_class)
@@ -97,7 +106,7 @@ module Kasket
         model_class.send(:alias_method, :kasket_cacheable?, :default_kasket_cacheable?)
       end
 
-      model_class.after_commit :kasket_after_commit
+      model_class.after_commit :kasket_after_commit_dummy
 
       if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)
         model_class.after_touch :kasket_after_commit
