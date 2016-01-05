@@ -58,7 +58,11 @@ module Kasket
         keys
       end
 
-      def kasket_after_commit
+      def kasket_after_save
+        Kasket.cache.add_to_blacklist(kasket_keys)
+      end
+
+      def kasket_committed!
         keys = kasket_keys
 
         if persisted? && Kasket::CONFIGURATION[:write_through]
@@ -93,7 +97,13 @@ module Kasket
       end
 
       def committed!(*)
-        kasket_after_commit if persisted? || destroyed?
+        Kasket.cache.clear_blacklist
+        kasket_committed! if persisted? || destroyed?
+        super
+      end
+
+      def rolledback!(*)
+        Kasket.cache.clear_blacklist
         super
       end
     end
@@ -107,9 +117,10 @@ module Kasket
       end
 
       model_class.after_commit :kasket_after_commit_dummy
+      model_class.after_save :kasket_after_save
 
       if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)
-        model_class.after_touch :kasket_after_commit
+        model_class.after_touch :kasket_committed!
       end
 
       class << model_class

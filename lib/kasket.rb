@@ -13,6 +13,7 @@ module Kasket
   autoload :Visitor,                'kasket/visitor'
   autoload :SelectManagerMixin,     'kasket/select_manager_mixin'
   autoload :RelationMixin,          'kasket/relation_mixin'
+  autoload :Cache,                  'kasket/cache'
 
   CONFIGURATION = {:max_collection_size => 100, :write_through => false}
 
@@ -33,10 +34,10 @@ module Kasket
   end
 
   def self.cache_store=(options)
-    @cache_store = ActiveSupport::Cache.lookup_store(options)
+    @cache_store = Cache.new(ActiveSupport::Cache.lookup_store(options))
   end
 
   def self.cache
-    @cache_store ||= Rails.cache
+    @cache_store ||= Cache.new(Rails.cache)
   end
 end
