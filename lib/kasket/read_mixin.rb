@@ -24,9 +24,9 @@ module Kasket
         else
           if value = Kasket.cache.read(query[:key])
             if value.is_a?(Array)
-              find_by_sql_with_kasket_on_id_array(value)
+              filter_pending_records(find_by_sql_with_kasket_on_id_array(value))
             else
-              Array.wrap(value).collect { |record| instantiate(record.dup) }
+              filter_pending_records(Array.wrap(value).collect { |record| instantiate(record.dup) })
             end
           else
             store_in_kasket(query[:key], find_by_sql_without_kasket(*args))
@@ -48,6 +48,14 @@ module Kasket
     end
 
     protected
+
+    def filter_pending_records(records)
+      if pending_map = Kasket.pending_map
+        records.map { |record| pending_map[record] || record }
+      else
+        records
+      end
+    end
 
     def missing_records_from_db(missing_keys)
       return {} if missing_keys.empty?

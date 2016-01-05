@@ -39,4 +39,17 @@ module Kasket
   def self.cache
     @cache_store ||= Rails.cache
   end
+
+  def self.pending_map
+    Thread.current['kasket_pending_map']
+  end
+
+  def self.add_pending_record(record)
+    Thread.current['kasket_pending_map'] ||= {}
+    Thread.current['kasket_pending_map'][record] = record
+  end
+
+  def self.clear_pending_records
+    Thread.current['kasket_pending_map'] = nil
+  end
 end

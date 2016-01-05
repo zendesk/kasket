@@ -109,4 +109,23 @@ describe Kasket::ReadMixin do
       ExpiringComment.find(1).updated_at.wont_equal old # cache expired
     end
   end
+
+  describe "pending saved records" do
+    before do
+      @post = Post.find(1)
+      assert_not_nil Kasket.cache.read(@post.kasket_key)
+    end
+
+    it "returns saved version" do
+      ActiveRecord::Base.transaction do
+        @post.title = "new_title"
+        @post.save
+
+        assert_equal @post.title, Post.find(@post.id).title
+        assert_equal @post.title, Post.where(id: @post.id).first.title
+        assert_equal @post.title, Post.all.detect { |x| x.id == @post.id }.title
+        assert_equal @post.title, Post.find_by_sql("SELECT * FROM `posts` WHERE id = 1").first.title
+      end
+    end
+  end
 end
