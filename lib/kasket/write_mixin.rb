@@ -93,11 +93,11 @@ module Kasket
       end
 
       def kasket_after_save
-        Kasket.add_pending_record(self, self)
+        Kasket.add_pending_record(self)
       end
 
       def kasket_after_destroy
-        Kasket.add_pending_record(self, nil)
+        Kasket.add_pending_record(self, destroyed = true)
       end
 
       def committed!(*)
