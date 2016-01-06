@@ -92,8 +92,22 @@ module Kasket
         # This is here to force committed! to be invoked.
       end
 
+      def kasket_after_save
+        Kasket.add_pending_record(self)
+      end
+
+      def kasket_after_destroy
+        Kasket.add_pending_record(self, destroyed = true)
+      end
+
       def committed!(*)
+        Kasket.clear_pending_records
         kasket_after_commit if persisted? || destroyed?
+        super
+      end
+
+      def rolledback!(*)
+        Kasket.clear_pending_records
         super
       end
     end
@@ -106,6 +120,8 @@ module Kasket
         model_class.send(:alias_method, :kasket_cacheable?, :default_kasket_cacheable?)
       end
 
+      model_class.after_save :kasket_after_save
+      model_class.after_destroy :kasket_after_destroy
       model_class.after_commit :kasket_after_commit_dummy
 
       if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)

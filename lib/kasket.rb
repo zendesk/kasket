@@ -39,4 +39,19 @@ module Kasket
   def self.cache
     @cache_store ||= Rails.cache
   end
+
+  # Keys are the records being saved.
+  # Values are either the saved record, or nil if the record has been destroyed.
+  def self.pending_records
+    Thread.current[:kasket_pending_records]
+  end
+
+  def self.add_pending_record(record, destroyed = false)
+    Thread.current[:kasket_pending_records] ||= {}
+    Thread.current[:kasket_pending_records][record] = destroyed ? nil : record
+  end
+
+  def self.clear_pending_records
+    Thread.current[:kasket_pending_records] = nil
+  end
 end

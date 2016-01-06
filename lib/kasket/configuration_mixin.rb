@@ -6,15 +6,15 @@ module Kasket
   module ConfigurationMixin
 
     def without_kasket(&block)
-      old_value = Thread.current['kasket_disabled'] || false
-      Thread.current['kasket_disabled'] = true
+      old_value = Thread.current[:kasket_disabled] || false
+      Thread.current[:kasket_disabled] = true
       yield
     ensure
-      Thread.current['kasket_disabled'] = old_value
+      Thread.current[:kasket_disabled] = old_value
     end
 
     def use_kasket?
-      !Thread.current['kasket_disabled']
+      !Thread.current[:kasket_disabled]
     end
 
     def kasket_parser
