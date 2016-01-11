@@ -12,12 +12,12 @@ describe "find some" do
   end
 
   it "use cache for find(id, id) calls" do
-    Post.expects(:find_by_sql_without_kasket).never
+    Post.connection.expects(:select_all).never
     Post.find(@post1.id, @post2.id)
   end
 
   it "use cache for where :id => xxx calls" do
-    Post.expects(:find_by_sql_without_kasket).never
+    Post.connection.expects(:select_all).never
     Post.where(:id => [@post1.id, @post2.id]).to_a
   end
 
@@ -40,7 +40,7 @@ describe "find some" do
     assert_equal [@post1, @post2].map(&:id).sort, found_posts.map(&:id).sort
 
     # now all are cached
-    Post.expects(:find_by_sql_without_kasket).never
+    Post.connection.expects(:select_all).never
     found_posts = Post.find(@post1.id, @post2.id)
     assert_equal [@post1, @post2].map(&:id).sort, found_posts.map(&:id).sort
   end

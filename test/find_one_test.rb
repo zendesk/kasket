@@ -10,7 +10,7 @@ describe "find one" do
     assert_equal(post, Post.find(post.id))
     assert(Kasket.cache.read(post.kasket_key))
 
-    Post.expects(:find_by_sql_without_kasket).never
+    Post.connection.expects(:select_all).never
     assert_equal(post, Post.find(post.id))
   end
 

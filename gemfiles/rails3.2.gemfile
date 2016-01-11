@@ -1,5 +1,7 @@
 gem "activerecord", "~> 3.2.1"
 gem "minitest", "~> 4.7.5"
+gem 'test-unit-minitest'
+gem "mysql2", "~> 0.3.0", platforms: :ruby
 
 gemspec path: "../"
 

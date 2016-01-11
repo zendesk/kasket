@@ -1,4 +1,5 @@
 gem "activerecord", "~> 4.2.3"
+gem "mysql2", platforms: :ruby
 
 gemspec path: "../"
 
