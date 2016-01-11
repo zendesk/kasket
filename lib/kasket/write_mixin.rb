@@ -1,21 +1,22 @@
 module Kasket
   module WriteMixin
+    module PrependMethods
+      def update_counters(*args)
+        remove_from_kasket(args[0])
+        super(*args)
+      end
+
+      def transaction(*args)
+        without_kasket do
+          super(*args) { yield }
+        end
+      end
+    end
 
     module ClassMethods
       def remove_from_kasket(ids)
         Array(ids).each do |id|
           Kasket.cache.delete(kasket_key_for_id(id))
-        end
-      end
-
-      def update_counters_with_kasket_clearing(*args)
-        remove_from_kasket(args[0])
-        update_counters_without_kasket_clearing(*args)
-      end
-
-      def transaction_with_kasket_disabled(*args)
-        without_kasket do
-          transaction_without_kasket_disabled(*args) { yield }
         end
       end
     end
@@ -113,8 +114,10 @@ module Kasket
     end
 
     def self.included(model_class)
-      model_class.extend         ClassMethods
-      model_class.send :include, InstanceMethods
+      model_class.extend  ClassMethods
+      model_class.include InstanceMethods
+
+      model_class.singleton_class.prepend PrependMethods
 
       unless model_class.method_defined?(:kasket_cacheable?)
         model_class.send(:alias_method, :kasket_cacheable?, :default_kasket_cacheable?)
@@ -126,11 +129,6 @@ module Kasket
 
       if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)
         model_class.after_touch :kasket_after_commit
-      end
-
-      class << model_class
-        alias_method_chain :transaction, :kasket_disabled
-        alias_method_chain :update_counters, :kasket_clearing
       end
     end
   end

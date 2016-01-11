@@ -28,7 +28,7 @@ describe Kasket::ReadMixin do
     it "handle unsupported sql" do
       Kasket.cache.expects(:read).never
       Kasket.cache.expects(:write).never
-      assert_equal @post_records, Post.find_by_sql_with_kasket('select unsupported sql statement')
+      assert_equal @post_records, Post.find_by_sql('select unsupported sql statement')
     end
 
     it "read results" do
@@ -53,7 +53,7 @@ describe Kasket::ReadMixin do
       assert_equal(["#{Comment.kasket_key_prefix}id=1", "#{Comment.kasket_key_prefix}id=2"], stored_value)
       assert_equal(@comment_database_result, stored_value.map {|key| Kasket.cache.read(key)})
 
-      Comment.expects(:find_by_sql_without_kasket).never
+      Comment.connection.expects(:select_all).never
       records = Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
       assert_equal(@comment_records, records.sort {|c1, c2| c1.id <=> c2.id})
     end
