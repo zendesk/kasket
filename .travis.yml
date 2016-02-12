@@ -14,9 +14,6 @@ branches:
   only: [master]
 matrix:
   exclude:
-    - rvm: 2.2.3
-      gemfile: gemfiles/rails3.2.gemfile
-  allow_failures:
     - rvm: 2.0.0
       gemfile: gemfiles/rails4.1.gemfile
     - rvm: 2.0.0
