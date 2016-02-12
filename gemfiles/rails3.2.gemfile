@@ -1,7 +1,5 @@
-gem "activerecord", "~> 3.2.1"
-gem "minitest", "~> 4.7.5"
-gem "test-unit-minitest"
-
-gemspec path: "../"
-
 eval_gemfile('gemfiles/common.rb')
+
+gem 'activerecord', '~> 3.2.1'
+gem 'minitest', '~> 4.7.5'
+gem 'test-unit-minitest'
