@@ -45,7 +45,7 @@ module Kasket
 
     def visit_Arel_Nodes_SelectCore(node, *_)
       return :unsupported if node.groups.any?
-      return :unsupported if node.having
+      return :unsupported if (ActiveRecord::VERSION::MAJOR < 5 ? node.having : node.havings.present?)
       return :unsupported if node.set_quantifier
       return :unsupported if (!node.source || node.source.empty?)
       return :unsupported if node.projections.size != 1
@@ -62,7 +62,11 @@ module Kasket
     end
 
     def visit_Arel_Nodes_Limit(node, *_)
-      {:limit => node.value.to_i}
+     if ActiveRecord::VERSION::MAJOR < 5
+       {:limit => node.value.to_i}
+     else
+       {:limit => visit(node.value).to_i}
+     end
     end
 
     def visit_Arel_Nodes_JoinSource(node, *_)
@@ -109,7 +113,11 @@ module Kasket
     end
 
     def visit_Arel_Nodes_BindParam(x, *_)
-      visit(@binds.shift[1])
+      if ActiveRecord::VERSION::MAJOR < 5
+        visit(@binds.shift[1])
+      else
+        visit(@binds.shift)
+      end
     end
 
     def visit_Array(node, *_)
@@ -120,9 +128,8 @@ module Kasket
       quoted(node.val)
     end
 
-    #TODO: We are actually not using this?
     def quoted(node)
-      @model_class.connection.quote(node, self.last_column)
+      @model_class.connection.quote(node)
     end
 
     alias :visit_String                :literal
