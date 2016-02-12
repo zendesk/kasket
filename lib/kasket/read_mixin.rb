@@ -3,7 +3,8 @@ module Kasket
 
     def self.extended(base)
       class << base
-        alias_method_chain :find_by_sql, :kasket
+        alias_method :find_by_sql_without_kasket, :find_by_sql
+        alias_method :find_by_sql, :find_by_sql_with_kasket
       end
     end
 
