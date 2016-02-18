@@ -129,8 +129,11 @@ module Kasket
       end
 
       class << model_class
-        alias_method_chain :transaction, :kasket_disabled
-        alias_method_chain :update_counters, :kasket_clearing
+        alias_method :transaction_without_kasket_disabled, :transaction
+        alias_method :transaction, :transaction_with_kasket_disabled
+
+        alias_method :update_counters_without_kasket_clearing, :update_counters
+        alias_method :update_counters, :update_counters_with_kasket_clearing
       end
     end
   end

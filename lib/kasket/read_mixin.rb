@@ -3,7 +3,8 @@ module Kasket
 
     def self.extended(base)
       class << base
-        alias_method_chain :find_by_sql, :kasket
+        alias_method :find_by_sql_without_kasket, :find_by_sql
+        alias_method :find_by_sql, :find_by_sql_with_kasket
       end
     end
 
@@ -12,7 +13,11 @@ module Kasket
 
       if use_kasket?
         if sql.respond_to?(:to_kasket_query)
-          query = sql.to_kasket_query(self, args[1])
+          if ActiveRecord::VERSION::MAJOR < 5
+            query = sql.to_kasket_query(self, args[1])
+          else
+            query = sql.to_kasket_query(self, args[1].map(&:value_for_database))
+          end
         else
           query = kasket_parser.parse(sanitize_sql(sql))
         end

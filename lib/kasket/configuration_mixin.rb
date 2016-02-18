@@ -89,8 +89,11 @@ module Kasket
 
     def quoted_value_for_column(value, column)
       if column
-        casted_value = if column.respond_to?(:type_cast_for_database)
-          column.type_cast_for_database(value) # Rails 4.2 and up
+        casted_value = case
+        when connection.respond_to?(:type_cast_from_column)
+          connection.type_cast_from_column(column, value)
+        when column.respond_to?(:type_cast_for_database)
+          column.type_cast_for_database(value) # Rails 4.2
         else
           column.type_cast(value)
         end

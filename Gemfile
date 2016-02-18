@@ -1,3 +1,1 @@
-gemspec
-
-eval_gemfile('gemfiles/common.rb')
+eval_gemfile('gemfiles/rails4.2.gemfile')
