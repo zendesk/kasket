@@ -1,8 +1,9 @@
 module Kasket
+  VERSION = '4.3.0'
   class Version
-    MAJOR = 4
-    MINOR = 2
-    PATCH = 1
+    MAJOR = Kasket::VERSION.split('.')[0]
+    MINOR = Kasket::VERSION.split('.')[1]
+    PATCH = Kasket::VERSION.split('.')[2]
     STRING = "#{MAJOR}.#{MINOR}.#{PATCH}"
     PROTOCOL = 4
   end
