@@ -125,7 +125,7 @@ module Kasket
     end
 
     def visit_Arel_Nodes_Casted(node, *_)
-      quoted(node.val)
+      quoted(node.val) unless node.val.nil?
     end
 
     def quoted(node)
