@@ -52,7 +52,11 @@ module Kasket
     end
 
     def kasket_indices
-      result = @kasket_indices || []
+      result = if defined?(@kasket_indices) && @kasket_indices
+        @kasket_indices
+      else
+        []
+      end
       result += superclass.kasket_indices unless self == ActiveRecord::Base
       result.uniq
     end

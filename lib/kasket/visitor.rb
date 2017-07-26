@@ -94,8 +94,13 @@ module Kasket
     end
 
     def visit_Arel_Nodes_Equality(node, *_)
-      right = node.right
-      [visit(node.left), right ? visit(right) : nil]
+      right = case node.right
+      when false then 0 # This should probably be removed when Rails 3.2 is not supported anymore
+      when nil   then nil
+      else
+        visit(node.right)
+      end
+      [visit(node.left), right]
     end
 
     def visit_Arel_Attributes_Attribute(node, *_)
@@ -128,14 +133,20 @@ module Kasket
       quoted(node.val) unless node.val.nil?
     end
 
+    def visit_TrueClass(node)
+      1
+    end
+
+    def visit_FalseClass(node)
+      0
+    end
+
     def quoted(node)
       @model_class.connection.quote(node)
     end
 
     alias :visit_String                :literal
     alias :visit_Fixnum                :literal
-    alias :visit_TrueClass             :literal
-    alias :visit_FalseClass            :literal
     alias :visit_Arel_Nodes_SqlLiteral :literal
   end
 end

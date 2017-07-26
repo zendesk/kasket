@@ -72,7 +72,7 @@ describe Kasket::QueryParser do
 
     describe "extract options" do
       it "provide the limit" do
-        assert_equal nil, parse(:conditions => {:id => 2})[:limit]
+        assert_nil      parse(:conditions => {:id => 2})[:limit]
         assert_equal 1, parse(:conditions => {:id => 2}, :limit => 1)[:limit]
       end
     end
