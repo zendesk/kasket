@@ -21,7 +21,6 @@ describe "cache expiry" do
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'/first")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "blog_id=#{@post.blog_id}/id=#{@post.id}")
-      Kasket.cache.expects(:delete).never
 
       @post.destroy
     end
@@ -49,7 +48,6 @@ describe "cache expiry" do
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'/first")
       Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "blog_id=#{@post.blog_id}/id=#{@post.id}")
-      Kasket.cache.expects(:delete).never
 
       @post.title = "new_title"
       @post.save
@@ -78,7 +76,6 @@ describe "cache expiry" do
         Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'")
         Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'/first")
         Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "blog_id=#{@post.blog_id}/id=#{@post.id}")
-        Kasket.cache.expects(:delete).never
 
         @post.title = "new_title"
         @post.save
