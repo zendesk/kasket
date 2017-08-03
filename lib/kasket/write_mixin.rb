@@ -37,11 +37,12 @@ module Kasket
         end
       end
 
-      def kasket_keys
+      def kasket_keys(options = {})
         attribute_sets = [attributes.symbolize_keys]
 
+        previous_changes = options[:previous_changes] || previous_changes()
         if previous_changes.present?
-          old_attributes = Hash[*previous_changes.map {|attribute, values| [attribute, values[0]]}.flatten].symbolize_keys
+          old_attributes = Hash[*previous_changes.map { |attribute, values| [attribute, values[0]] }.flatten].symbolize_keys
           attribute_sets << old_attributes.reverse_merge(attribute_sets[0])
         end
 
@@ -71,21 +72,32 @@ module Kasket
         end
       end
 
-      def clear_kasket_indices
-        kasket_keys.each do |key|
+      def clear_kasket_indices(options = {})
+        kasket_keys(options).each do |key|
           Kasket.cache.delete(key)
         end
       end
 
-      def reload(*args)
+      def reload(*)
         clear_kasket_indices
         super
       end
 
-      def update_column(*args)
-        result = super
-        clear_kasket_indices
-        result
+      if ActiveRecord::VERSION::MAJOR == 3
+        def update_column(column, value)
+          previous_changes = {column => [attributes[column.to_s], value]}
+          result = super
+          clear_kasket_indices(previous_changes: previous_changes)
+          result
+        end
+      else
+        def update_columns(new_attributes)
+          previous_attributes = attributes
+          previous_changes = new_attributes.each_with_object({}) { |(k, v), all| all[k] = [previous_attributes[k.to_s], v] }
+          result = super
+          clear_kasket_indices(previous_changes: previous_changes)
+          result
+        end
       end
 
       def kasket_after_commit_dummy
