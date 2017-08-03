@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'active_record'
 require 'active_support'
 
@@ -14,7 +15,7 @@ module Kasket
   autoload :SelectManagerMixin,     'kasket/select_manager_mixin'
   autoload :RelationMixin,          'kasket/relation_mixin'
 
-  CONFIGURATION = {:max_collection_size => 100, :write_through => false}
+  CONFIGURATION = { max_collection_size: 100, write_through: false } # rubocop:disable Style/MutableConstant
 
   module_function
 

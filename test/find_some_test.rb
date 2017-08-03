@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "helper"
 
 describe "find some" do
@@ -18,7 +19,7 @@ describe "find some" do
 
   it "use cache for where :id => xxx calls" do
     Post.expects(:find_by_sql_without_kasket).never
-    Post.where(:id => [@post1.id, @post2.id]).to_a
+    Post.where(id: [@post1.id, @post2.id]).to_a
   end
 
   it "cache when found using find(id, id) calls" do
@@ -47,7 +48,7 @@ describe "find some" do
 
   describe "unfound" do
     it "ignore unfound when using find_all_by_id" do
-      found_posts = Post.where(:id => [@post1.id, 1231232]).to_a
+      found_posts = Post.where(id: [@post1.id, 1231232]).to_a
       assert_equal [@post1.id], found_posts.map(&:id)
     end
 

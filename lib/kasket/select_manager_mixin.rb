@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Kasket
   module SelectManagerMixin
     def to_kasket_query(klass, binds = [])
@@ -17,7 +18,7 @@ module Kasket
         # return nil if !query[:index].include?(:id)
       end
 
-      if query[:index].size > 1 && query[:attributes].any? { |attribute, value| value.is_a?(Array) }
+      if query[:index].size > 1 && query[:attributes].any? { |_attribute, value| value.is_a?(Array) }
         return nil
       end
 

@@ -1,6 +1,6 @@
+# frozen_string_literal: true
 module Kasket
   module WriteMixin
-
     module ClassMethods
       def remove_from_kasket(ids)
         Array(ids).each do |id|
@@ -42,7 +42,9 @@ module Kasket
 
         previous_changes = options[:previous_changes] || previous_changes()
         if previous_changes.present?
-          old_attributes = previous_changes.each_with_object({}) { |(attribute, (old, _)), all| all[attribute.to_s] = old }
+          old_attributes = previous_changes.each_with_object({}) do |(attribute, (old, _)), all|
+            all[attribute.to_s] = old
+          end
           attribute_sets << old_attributes.reverse_merge(attribute_sets[0])
           attribute_sets << attribute_sets[0].merge(old_attributes)
         end
@@ -88,7 +90,7 @@ module Kasket
 
       if ActiveRecord::VERSION::MAJOR == 3
         def update_column(column, value)
-          previous_changes = {column => [attributes[column.to_s], value]}
+          previous_changes = { column => [attributes[column.to_s], value] }
           result = super
           clear_kasket_indices(previous_changes: previous_changes)
           result
@@ -96,7 +98,9 @@ module Kasket
       else
         def update_columns(new_attributes)
           previous_attributes = attributes
-          previous_changes = new_attributes.each_with_object({}) { |(k, v), all| all[k] = [previous_attributes[k.to_s], v] }
+          previous_changes = new_attributes.each_with_object({}) do |(k, v), all|
+            all[k] = [previous_attributes[k.to_s], v]
+          end
           result = super
           clear_kasket_indices(previous_changes: previous_changes)
           result
@@ -112,7 +116,7 @@ module Kasket
       end
 
       def kasket_after_destroy
-        Kasket.add_pending_record(self, destroyed = true)
+        Kasket.add_pending_record(self, _destroyed = true)
       end
 
       def committed!(*)

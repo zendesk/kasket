@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "helper"
 require "digest/md5"
 
@@ -5,14 +6,14 @@ describe "configuration mixin" do
   describe "Generating cache keys" do
     it "not choke on empty numeric attributes" do
       expected_cache_key = "#{Post.kasket_key_prefix}blog_id=null"
-      query_attributes   = [ [:blog_id, ''] ]
+      query_attributes   = [[:blog_id, '']]
 
       assert_equal expected_cache_key, Post.kasket_key_for(query_attributes)
     end
 
     it "not fail on unknown columns" do
       expected_cache_key = "#{Post.kasket_key_prefix}does_not_exist=111"
-      query_attributes   = [ [:does_not_exist, '111'] ]
+      query_attributes   = [[:does_not_exist, '111']]
 
       assert_equal expected_cache_key, Post.kasket_key_for(query_attributes)
     end
@@ -23,20 +24,22 @@ describe "configuration mixin" do
     end
 
     it "not generate keys with spaces" do
-      query_attributes = [ [:title, 'this key has speces'] ]
+      query_attributes = [[:title, 'this key has speces']]
 
-      assert(!(Post.kasket_key_for(query_attributes) =~ /\s/))
+      assert(Post.kasket_key_for(query_attributes) !~ /\s/)
     end
 
     it "downcase string attributes" do
-      query_attributes = [ [:title, 'ThIs'] ]
+      query_attributes = [[:title, 'ThIs']]
       expected_cache_key = "#{Post.kasket_key_prefix}title='this'"
 
       assert_equal expected_cache_key, Post.kasket_key_for(query_attributes)
     end
 
     it "build correct prefix" do
-      assert_equal "kasket-#{Kasket::Version::PROTOCOL}/R#{ActiveRecord::VERSION::MAJOR}#{ActiveRecord::VERSION::MINOR}/posts/version=#{POST_VERSION}/", Post.kasket_key_prefix
+      protocol = Kasket::Version::PROTOCOL
+      ar_version = "#{ActiveRecord::VERSION::MAJOR}#{ActiveRecord::VERSION::MINOR}"
+      assert_equal "kasket-#{protocol}/R#{ar_version}/posts/version=#{POST_VERSION}/", Post.kasket_key_prefix
     end
   end
 end

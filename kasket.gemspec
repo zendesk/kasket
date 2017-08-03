@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require './lib/kasket/version'
 
 Gem::Specification.new do |s|
@@ -9,6 +10,7 @@ Gem::Specification.new do |s|
   s.summary     = "A write back caching layer on active record"
   s.description = "puts a cap on your queries"
   s.license     = "Apache License Version 2.0"
+  s.files       = Dir.glob("lib/**/*") + %w[README.md]
 
   s.add_runtime_dependency("activerecord", ">= 3.2", "< 5.2")
 
@@ -20,6 +22,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency("minitest")
   s.add_development_dependency("minitest-rg")
   s.add_development_dependency("timecop")
-
-  s.files        = Dir.glob("lib/**/*") + %w(README.md)
 end
