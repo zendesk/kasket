@@ -1,5 +1,5 @@
 module Kasket
-  VERSION = '4.4.2'
+  VERSION = '4.4.3'
   class Version
     MAJOR = Kasket::VERSION.split('.')[0]
     MINOR = Kasket::VERSION.split('.')[1]
