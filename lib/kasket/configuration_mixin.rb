@@ -65,7 +65,7 @@ module Kasket
       kasket_indices.include?(sorted_attributes)
     end
 
-    def has_kasket(options = {})
+    def has_kasket
       has_kasket_on :id
     end
 
