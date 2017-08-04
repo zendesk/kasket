@@ -38,20 +38,23 @@ module Kasket
       end
 
       def kasket_keys(options = {})
-        attribute_sets = [attributes.symbolize_keys]
+        attribute_sets = [attributes]
 
         previous_changes = options[:previous_changes] || previous_changes()
         if previous_changes.present?
-          old_attributes = Hash[*previous_changes.map { |attribute, values| [attribute, values[0]] }.flatten].symbolize_keys
+          old_attributes = previous_changes.each_with_object({}) { |(attribute, (old, _)), all| all[attribute.to_s] = old }
           attribute_sets << old_attributes.reverse_merge(attribute_sets[0])
+          attribute_sets << attribute_sets[0].merge(old_attributes)
         end
 
         keys = []
         self.class.kasket_indices.each do |index|
-          keys += attribute_sets.map do |attribute_set|
-            key = self.class.kasket_key_for(index.map { |attribute| [attribute, attribute_set[attribute]]})
-            index.include?(:id) ? key : [key, key + '/first']
-          end
+          keys.concat(
+            attribute_sets.map do |attribute_set|
+              key = self.class.kasket_key_for(index.map { |attribute| [attribute, attribute_set[attribute.to_s]] })
+              index.include?(:id) ? key : [key, key + '/first']
+            end
+          )
         end
 
         keys.flatten!
