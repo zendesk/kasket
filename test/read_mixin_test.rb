@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "helper"
 
 describe Kasket::ReadMixin do
@@ -6,16 +7,19 @@ describe Kasket::ReadMixin do
   describe "find by sql with kasket" do
     before do
       if ActiveRecord::VERSION::STRING >= '4.2.0'
-        @post_database_result = { 'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil, "poly_type" => nil, "created_at" => nil, "updated_at" => nil }
+        @post_database_result = {
+          'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil,
+          "poly_type" => nil, "created_at" => nil, "updated_at" => nil
+        }
         @comment_database_result = [
-          { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil , "public" => nil},
-          { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil , "public" => nil }
+          { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil },
+          { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil }
         ]
       else
         @post_database_result = { 'id' => 1, 'title' => 'Hello' }
         @comment_database_result = [
-          { 'id' => 1, 'body' => 'Hello'},
-          { 'id' => 2, 'body' => 'World'}
+          { 'id' => 1, 'body' => 'Hello' },
+          { 'id' => 2, 'body' => 'World' }
         ]
       end
 
@@ -55,12 +59,12 @@ describe Kasket::ReadMixin do
 
       Comment.expects(:find_by_sql_without_kasket).never
       records = Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
-      assert_equal(@comment_records, records.sort {|c1, c2| c1.id <=> c2.id})
+      assert_equal(@comment_records, records.sort_by(&:id))
     end
 
     describe "modifying results" do
       before do
-        Kasket.cache.write("#{Post.kasket_key_prefix}id=1", {'id' => 1, 'title' => "asd"})
+        Kasket.cache.write("#{Post.kasket_key_prefix}id=1", 'id' => 1, 'title' => "asd")
         @sql = 'SELECT * FROM `posts` WHERE (id = 1)'
         @record = Post.find_by_sql(@sql).first
         assert_equal "asd", @record.title # read from cache ?
@@ -81,10 +85,10 @@ describe Kasket::ReadMixin do
     author = authors(:mick)
 
     author = Author.find(author.id)
-    assert_equal({'sex' => 'male'}, author.metadata)
+    assert_equal({ 'sex' => 'male' }, author.metadata)
 
     author = Author.find(author.id)
-    assert_equal({'sex' => 'male'}, author.metadata)
+    assert_equal({ 'sex' => 'male' }, author.metadata)
   end
 
   it "not store time with zone" do

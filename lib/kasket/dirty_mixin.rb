@@ -1,9 +1,10 @@
+# frozen_string_literal: true
 module Kasket
   module DirtyMixin
     def kasket_dirty_methods(*method_names)
       method_names.each do |method|
         without = "without_kasket_update_#{method}"
-        return if method_defined? without
+        break if method_defined? without
 
         alias_method without, method
         define_method method do |*args, &block|

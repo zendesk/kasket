@@ -1,11 +1,10 @@
+# frozen_string_literal: true
 require 'active_support'
 require "digest/md5"
 
 module Kasket
-
   module ConfigurationMixin
-
-    def without_kasket(&block)
+    def without_kasket
       old_value = Thread.current[:kasket_disabled] || false
       Thread.current[:kasket_disabled] = true
       yield
@@ -22,7 +21,10 @@ module Kasket
     end
 
     def kasket_key_prefix
-      @kasket_key_prefix ||= "kasket-#{Kasket::Version::PROTOCOL}/#{kasket_activerecord_version}/#{table_name}/version=#{column_names.join.sum}/"
+      @kasket_key_prefix ||= begin
+        column_hash = column_names.join.sum
+        "kasket-#{Kasket::Version::PROTOCOL}/#{kasket_activerecord_version}/#{table_name}/version=#{column_hash}/"
+      end
     end
 
     def kasket_activerecord_version
@@ -36,7 +38,7 @@ module Kasket
         key = attribute_value_pairs.map do |attribute, value|
           column = columns_hash[attribute.to_s]
           value = nil if value.blank?
-          attribute.to_s << '=' << quoted_value_for_column(value, column)
+          "#{attribute}=#{quoted_value_for_column(value, column)}"
         end.join('/')
 
         if key.size > (250 - kasket_key_prefix.size) || key =~ /\s/
@@ -71,6 +73,8 @@ module Kasket
 
     def has_kasket_on(*args)
       attributes = args.sort_by!(&:to_s)
+
+      # enforce id index
       if attributes != [:id] && !has_kasket_index_on?([:id])
         has_kasket_on(:id)
       end
@@ -93,14 +97,14 @@ module Kasket
 
     def quoted_value_for_column(value, column)
       if column
-        casted_value = case
-        when connection.respond_to?(:type_cast_from_column)
-          connection.type_cast_from_column(column, value)
-        when column.respond_to?(:type_cast_for_database)
-          column.type_cast_for_database(value) # Rails 4.2
-        else
-          column.type_cast(value)
-        end
+        casted_value =
+          if connection.respond_to?(:type_cast_from_column)
+            connection.type_cast_from_column(column, value)
+          elsif column.respond_to?(:type_cast_for_database)
+            column.type_cast_for_database(value) # Rails 4.2
+          else
+            column.type_cast(value)
+          end
         connection.quote(casted_value).downcase
       else
         value.to_s

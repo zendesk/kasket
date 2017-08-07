@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "helper"
 
 describe "transactions" do
@@ -15,7 +16,7 @@ describe "transactions" do
     before { Comment.has_kasket }
     it "disable kasket" do
       Post.transaction do
-        assert_equal false,  Comment.use_kasket?
+        assert_equal false, Comment.use_kasket?
         assert_equal false, Post.use_kasket?
         Comment.transaction do
           assert_equal false, Post.use_kasket?

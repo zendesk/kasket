@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Kasket
   VERSION = '4.4.3'
   class Version

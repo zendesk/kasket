@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'arel'
 
 module Kasket
@@ -45,9 +46,9 @@ module Kasket
 
     def visit_Arel_Nodes_SelectCore(node, *_)
       return :unsupported if node.groups.any?
-      return :unsupported if (ActiveRecord::VERSION::MAJOR < 5 ? node.having : node.havings.present?)
+      return :unsupported if ActiveRecord::VERSION::MAJOR < 5 ? node.having : node.havings.present?
       return :unsupported if node.set_quantifier
-      return :unsupported if (!node.source || node.source.empty?)
+      return :unsupported if !node.source || node.source.empty?
       return :unsupported if node.projections.size != 1
 
       select = node.projections[0]
@@ -62,28 +63,28 @@ module Kasket
     end
 
     def visit_Arel_Nodes_Limit(node, *_)
-     if ActiveRecord::VERSION::MAJOR < 5
-       {:limit => node.value.to_i}
-     else
-       {:limit => visit(node.value).to_i}
-     end
+      if ActiveRecord::VERSION::MAJOR < 5
+        { limit: node.value.to_i }
+      else
+        { limit: visit(node.value).to_i }
+      end
     end
 
     def visit_Arel_Nodes_JoinSource(node, *_)
       return :unsupported if !node.left || node.right.any?
-      return :unsupported if !node.left.is_a?(Arel::Table)
+      return :unsupported unless node.left.is_a?(Arel::Table)
       visit(node.left)
     end
 
     def visit_Arel_Table(node, *_)
-      {:from => node.name}
+      { from: node.name }
     end
 
     def visit_Arel_Nodes_And(node, *_)
       attributes = node.children.map { |child| visit(child) }
       return :unsupported if attributes.include?(:unsupported)
       attributes.sort! { |pair1, pair2| pair1[0].to_s <=> pair2[0].to_s }
-      { :attributes => attributes }
+      { attributes: attributes }
     end
 
     def visit_Arel_Nodes_In(node, *_)
@@ -94,12 +95,12 @@ module Kasket
     end
 
     def visit_Arel_Nodes_Equality(node, *_)
-      right = case node.right
-      when false then 0 # This should probably be removed when Rails 3.2 is not supported anymore
-      when nil   then nil
-      else
-        visit(node.right)
-      end
+      right =
+        case node.right
+        when false then 0 # This should probably be removed when Rails 3.2 is not supported anymore
+        when nil   then nil
+        else visit(node.right)
+        end
       [visit(node.left), right]
     end
 
@@ -110,14 +111,13 @@ module Kasket
 
     def literal(node, *_)
       if node == '?'
-        column, value = @binds.shift
-        value.to_s
+        @binds.shift.last.to_s
       else
         node.to_s
       end
     end
 
-    def visit_Arel_Nodes_BindParam(x, *_)
+    def visit_Arel_Nodes_BindParam(_x, *_)
       if ActiveRecord::VERSION::MAJOR < 5
         visit(@binds.shift[1])
       else
@@ -133,11 +133,11 @@ module Kasket
       quoted(node.val) unless node.val.nil?
     end
 
-    def visit_TrueClass(node)
+    def visit_TrueClass(_node)
       1
     end
 
-    def visit_FalseClass(node)
+    def visit_FalseClass(_node)
       0
     end
 
@@ -145,8 +145,8 @@ module Kasket
       @model_class.connection.quote(node)
     end
 
-    alias :visit_String                :literal
-    alias :visit_Fixnum                :literal
-    alias :visit_Arel_Nodes_SqlLiteral :literal
+    alias_method :visit_String, :literal
+    alias_method :visit_Fixnum, :literal
+    alias_method :visit_Arel_Nodes_SqlLiteral, :literal
   end
 end

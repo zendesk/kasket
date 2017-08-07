@@ -24,3 +24,7 @@ matrix:
       gemfile: gemfiles/rails5.0.gemfile
     - rvm: jruby
       gemfile: gemfiles/rails5.1.gemfile
+  include:
+    - rvm: 2.3.4
+      script: bundle exec rubocop
+      gemfile: gemfiles/rails5.1.gemfile

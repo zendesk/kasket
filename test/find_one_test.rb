@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "helper"
 
 describe "find one" do
@@ -17,11 +18,11 @@ describe "find one" do
   it "only cache on indexed attributes" do
     Kasket.cache.expects(:read).twice
     Post.find_by_id(1)
-    Post.where(:blog_id => 2).find_by_id 1
+    Post.where(blog_id: 2).find_by_id 1
 
     Kasket.cache.expects(:read).never
-    Post.where(:blog_id => 2).first # partially indexed
-    Post.where(:updated_at => Time.at(0)).find_by_id(1) # partially indexed
+    Post.where(blog_id: 2).first # partially indexed
+    Post.where(updated_at: Time.at(0)).find_by_id(1) # partially indexed
   end
 
   it "not use cache when using the :select option" do

@@ -1,6 +1,6 @@
+# frozen_string_literal: true
 module Kasket
   module ReadMixin
-
     def self.extended(base)
       class << base
         alias_method :find_by_sql_without_kasket, :find_by_sql
@@ -12,14 +12,14 @@ module Kasket
       sql = args[0]
 
       if use_kasket?
-        if sql.respond_to?(:to_kasket_query)
+        query = if sql.respond_to?(:to_kasket_query)
           if ActiveRecord::VERSION::MAJOR < 5
-            query = sql.to_kasket_query(self, args[1])
+            sql.to_kasket_query(self, args[1])
           else
-            query = sql.to_kasket_query(self, args[1].map(&:value_for_database))
+            sql.to_kasket_query(self, args[1].map(&:value_for_database))
           end
         else
-          query = kasket_parser.parse(sanitize_sql(sql))
+          kasket_parser.parse(sanitize_sql(sql))
         end
       end
 
@@ -45,8 +45,8 @@ module Kasket
     def find_by_sql_with_kasket_on_id_array(keys)
       key_attributes_map = Kasket.cache.read_multi(*keys)
 
-      found_keys, missing_keys = keys.partition{|k| key_attributes_map[k] }
-      found_keys.each{|k| key_attributes_map[k] = instantiate(key_attributes_map[k].dup) }
+      found_keys, missing_keys = keys.partition {|k| key_attributes_map[k] }
+      found_keys.each {|k| key_attributes_map[k] = instantiate(key_attributes_map[k].dup) }
       key_attributes_map.merge!(missing_records_from_db(missing_keys))
 
       key_attributes_map.values.compact
@@ -65,11 +65,11 @@ module Kasket
     def missing_records_from_db(missing_keys)
       return {} if missing_keys.empty?
 
-      id_key_map = Hash[missing_keys.map{|key| [key.split('=').last.to_i, key] }]
+      id_key_map = Hash[missing_keys.map {|key| [key.split('=').last.to_i, key] }]
 
-      found = without_kasket { where(:id => id_key_map.keys).to_a }
+      found = without_kasket { where(id: id_key_map.keys).to_a }
       found.each(&:store_in_kasket)
-      Hash[found.map{|record| [id_key_map[record.id], record] }]
+      Hash[found.map {|record| [id_key_map[record.id], record] }]
     end
 
     def store_in_kasket(key, records)

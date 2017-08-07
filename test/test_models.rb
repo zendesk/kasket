@@ -1,4 +1,6 @@
-ActiveRecord::Base.configurations = YAML::load(IO.read(File.expand_path("database.yml", File.dirname(__FILE__))))
+# frozen_string_literal: true
+ActiveRecord::Base.configurations =
+  YAML.load(IO.read(File.expand_path("database.yml", File.dirname(__FILE__)))) # rubocop:disable Security/YAMLLoad
 
 config = ActiveRecord::Base.configurations['test']
 
@@ -10,7 +12,7 @@ load(File.dirname(__FILE__) + "/schema.rb")
 
 class Comment < ActiveRecord::Base
   belongs_to :post
-  has_one :author, :through => :post
+  has_one :author, through: :post
 
   has_kasket_on :post_id
 end
@@ -26,7 +28,7 @@ class Post < ActiveRecord::Base
   belongs_to :blog
   belongs_to :author
   has_many :comments
-  belongs_to :poly, :polymorphic => true
+  belongs_to :poly, polymorphic: true
 
   has_kasket
   has_kasket_on :title
@@ -46,7 +48,7 @@ end
 
 class Blog < ActiveRecord::Base
   has_many :posts
-  has_many :comments, :through => :posts
+  has_many :comments, through: :posts
 end
 
 class ExpiringComment < ActiveRecord::Base

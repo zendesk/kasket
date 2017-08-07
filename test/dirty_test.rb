@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_relative "helper"
 
 describe "dirty" do
@@ -6,7 +7,7 @@ describe "dirty" do
   def assert_cleared
     post = Post.first
 
-    Post.cache { pots = Post.find(post.id) }
+    Post.cache { post = Post.find(post.id) }
     assert Kasket.cache.read(post.kasket_key)
 
     yield post
@@ -15,11 +16,11 @@ describe "dirty" do
   end
 
   it "clear the indices when a dirty method is called" do
-    assert_cleared { |p| p.make_dirty! }
+    assert_cleared(&:make_dirty!)
   end
 
   it "clears the indices when touch is called" do
-    assert_cleared { |p| p.touch }
+    assert_cleared(&:touch)
   end
 
   it "clear the indices when update_column is called" do
