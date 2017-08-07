@@ -12,6 +12,8 @@ Gem::Specification.new do |s|
   s.license     = "Apache License Version 2.0"
   s.files       = Dir.glob("lib/**/*") + %w[README.md]
 
+  s.required_ruby_version = '>= 2.2.0'
+
   s.add_runtime_dependency("activerecord", ">= 3.2", "< 5.2")
 
   s.add_development_dependency("rake")
