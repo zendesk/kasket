@@ -123,13 +123,19 @@ describe Kasket::ReadMixin do
     it "returns saved version" do
       ActiveRecord::Base.transaction do
         @post.title = "new_title"
-        @post.save
+        @post.save!
 
         assert_equal @post.title, Post.find(@post.id).title
         assert_equal @post.title, Post.where(id: @post.id).first.title
         assert_equal @post.title, Post.all.detect { |x| x.id == @post.id }.title
         assert_equal @post.title, Post.find_by_sql("SELECT * FROM `posts` WHERE id = 1").first.title
       end
+    end
+
+    it "finds cached when searching by column" do
+      Post.where(title: 'no_comments').first.title.must_equal 'no_comments'
+      Post.expects(:find_by_sql_without_kasket).never
+      Post.where(title: 'no_comments').first.title.must_equal 'no_comments'
     end
 
     it "returns nothing if object destroyed" do

@@ -14,6 +14,8 @@ module Kasket
       super
     end
 
+    private
+
     def last_column=(col)
       Thread.current[:arel_visitors_to_sql_last_column] = col
     end
@@ -30,7 +32,7 @@ module Kasket
       return :unsupported if node.with
       return :unsupported if node.offset
       return :unsupported if node.lock
-      return :unsupported if node.orders.any?
+      return :unsupported if ordered?(node)
       return :unsupported if node.cores.size != 1
 
       query = visit_Arel_Nodes_SelectCore(node.cores[0])
@@ -143,6 +145,11 @@ module Kasket
 
     def quoted(node)
       @model_class.connection.quote(node)
+    end
+
+    # any non `id asc` ordering
+    def ordered?(node)
+      !node.orders.all? { |o| o.is_a?(Arel::Nodes::Ascending) && o.expr.name == "id" }
     end
 
     alias_method :visit_String, :literal
