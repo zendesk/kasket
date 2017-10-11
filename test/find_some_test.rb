@@ -17,9 +17,29 @@ describe "find some" do
     Post.find(@post1.id, @post2.id)
   end
 
+  it "use cache for find([id, id]) calls" do
+    Post.expects(:find_by_sql_without_kasket).never
+    Post.find([@post1.id, @post2.id])
+  end
+
+  it "use cache for find(id, id) calls with string values" do
+    Post.expects(:find_by_sql_without_kasket).never
+    Post.find(@post1.id.to_s, @post2.id.to_s)
+  end
+
+  it "use cache for find([id, id]) calls with string values" do
+    Post.expects(:find_by_sql_without_kasket).never
+    Post.find([@post1.id.to_s, @post2.id.to_s])
+  end
+
   it "use cache for where :id => xxx calls" do
     Post.expects(:find_by_sql_without_kasket).never
     Post.where(id: [@post1.id, @post2.id]).to_a
+  end
+
+  it "use cache for where :id => xxx calls with string values" do
+    Post.expects(:find_by_sql_without_kasket).never
+    Post.where(id: [@post1.id.to_s, @post2.id.to_s]).to_a
   end
 
   it "cache when found using find(id, id) calls" do
