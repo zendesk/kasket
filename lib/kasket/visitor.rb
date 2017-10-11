@@ -144,6 +144,7 @@ module Kasket
     end
 
     def quoted(node)
+      return node if node.is_a?(String)
       @model_class.connection.quote(node)
     end
 
