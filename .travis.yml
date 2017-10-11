@@ -10,6 +10,7 @@ branches:
 rvm:
   - 2.2.7
   - 2.3.4
+  - 2.4.2
   - jruby
 
 gemfile:
@@ -20,6 +21,10 @@ gemfile:
 
 matrix:
   exclude:
+    - rvm: 2.4.2
+      gemfile: gemfiles/rails3.2.gemfile
+    - rvm: 2.4.2
+      gemfile: gemfiles/rails4.2.gemfile
     - rvm: jruby
       gemfile: gemfiles/rails5.0.gemfile
     - rvm: jruby
