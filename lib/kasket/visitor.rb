@@ -132,7 +132,11 @@ module Kasket
     end
 
     def visit_Arel_Nodes_Casted(node, *_)
-      quoted(node.val) unless node.val.nil?
+      case node.val
+      when nil    then nil
+      when String then node.val
+      else quoted(node.val)
+      end
     end
 
     def visit_TrueClass(_node)
@@ -144,7 +148,6 @@ module Kasket
     end
 
     def quoted(node)
-      return node if node.is_a?(String)
       @model_class.connection.quote(node)
     end
 
