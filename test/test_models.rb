@@ -1,6 +1,9 @@
 # frozen_string_literal: true
+erb_config = IO.read(File.expand_path("database.yml", File.dirname(__FILE__)))
+yaml_config = ERB.new(erb_config).result
+
 ActiveRecord::Base.configurations =
-  YAML.load(IO.read(File.expand_path("database.yml", File.dirname(__FILE__)))) # rubocop:disable Security/YAMLLoad
+  YAML.load(yaml_config) # rubocop:disable Security/YAMLLoad
 
 config = ActiveRecord::Base.configurations['test']
 
