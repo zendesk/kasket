@@ -19,7 +19,7 @@ describe "configuration mixin" do
     end
 
     it "not generate keys longer that 255" do
-      Post.stubs(:quoted_value_for_column).returns((1..999).to_a.join.to_s)
+      Post.stubs(:kasket_quoted_value_for_column).returns((1..999).to_a.join.to_s)
       assert(Post.kasket_key_for([:blog_id, 1]).size < 255)
     end
 

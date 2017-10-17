@@ -38,7 +38,7 @@ module Kasket
         key = attribute_value_pairs.map do |attribute, value|
           column = columns_hash[attribute.to_s]
           value = nil if value.blank?
-          "#{attribute}=#{quoted_value_for_column(value, column)}"
+          "#{attribute}=#{kasket_quoted_value_for_column(value, column)}"
         end.join('/')
 
         if key.size > (250 - kasket_key_prefix.size) || key =~ /\s/
@@ -95,17 +95,16 @@ module Kasket
 
     private
 
-    def quoted_value_for_column(value, column)
+    def kasket_quoted_value_for_column(value, column)
       if column
+        conn = connection
         casted_value =
-          if connection.respond_to?(:type_cast_from_column)
-            connection.type_cast_from_column(column, value)
-          elsif column.respond_to?(:type_cast_for_database)
-            column.type_cast_for_database(value) # Rails 4.2
-          else
-            column.type_cast(value)
+          case ActiveRecord::VERSION::MAJOR
+          when 3 then column.type_cast(value)
+          when 4 then column.type_cast_for_database(value)
+          else conn.type_cast_from_column(column, value)
           end
-        connection.quote(casted_value).downcase
+        conn.quote(casted_value).downcase
       else
         value.to_s
       end
