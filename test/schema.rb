@@ -19,6 +19,7 @@ ActiveRecord::Schema.define do
       t.integer  'author_id'
       t.integer  'blog_id'
       t.integer  'poly_id'
+      t.integer  'big_id', limit: 8
       t.string   'poly_type'
       t.datetime 'created_at'
       t.datetime 'updated_at'

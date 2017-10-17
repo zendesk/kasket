@@ -21,6 +21,11 @@ describe Kasket::Visitor do
     assert_equal expected, Post.where(id: 1).to_kasket_query
   end
 
+  it "builds select Bignum" do
+    num = 9223372036854775807
+    Post.where(big_id: num).to_kasket_query.fetch(:attributes).must_equal([[:big_id, num.to_s]])
+  end
+
   it "builds with nil values" do
     expected = {
       attributes: [[:deleted_at, nil], [:id, "1"]],

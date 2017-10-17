@@ -159,6 +159,7 @@ module Kasket
     alias_method :visit_String, :literal
     alias_method :visit_Fixnum, :literal
     alias_method :visit_Integer, :literal
+    alias_method :visit_Bignum, :literal
     alias_method :visit_Arel_Nodes_SqlLiteral, :literal
   end
 end
