@@ -31,7 +31,7 @@ module Kasket
             if value.is_a?(Array)
               filter_pending_records(find_by_sql_with_kasket_on_id_array(value))
             else
-              filter_pending_records(Array.wrap(value).collect { |record| instantiate(record.dup) })
+              filter_pending_records(Array.wrap(value))
             end
           else
             store_in_kasket(query[:key], find_by_sql_without_kasket(*args))
@@ -45,8 +45,7 @@ module Kasket
     def find_by_sql_with_kasket_on_id_array(keys)
       key_attributes_map = Kasket.cache.read_multi(*keys)
 
-      found_keys, missing_keys = keys.partition {|k| key_attributes_map[k] }
-      found_keys.each {|k| key_attributes_map[k] = instantiate(key_attributes_map[k].dup) }
+      missing_keys = keys - key_attributes_map.keys
       key_attributes_map.merge!(missing_records_from_db(missing_keys))
 
       key_attributes_map.values.compact

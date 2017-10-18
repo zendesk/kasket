@@ -36,48 +36,30 @@ describe Kasket::ReadMixin do
     end
 
     it "read results" do
-      Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
+      Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_records.first)
       assert_equal @post_records, Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
     end
 
     it "support sql with ?" do
-      Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
+      Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_records.first)
       assert_equal @post_records, Post.find_by_sql(['SELECT * FROM `posts` WHERE (id = ?)', 1])
     end
 
     it "store results in kasket" do
       Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
 
-      assert_equal @post_database_result, Kasket.cache.read("#{Post.kasket_key_prefix}id=1")
+      assert_equal @post_records.first, Kasket.cache.read("#{Post.kasket_key_prefix}id=1")
     end
 
     it "store multiple records in cache" do
       Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
       stored_value = Kasket.cache.read("#{Comment.kasket_key_prefix}post_id=1")
       assert_equal(["#{Comment.kasket_key_prefix}id=1", "#{Comment.kasket_key_prefix}id=2"], stored_value)
-      assert_equal(@comment_database_result, stored_value.map {|key| Kasket.cache.read(key)})
+      stored_value.map { |key| Kasket.cache.read(key).id }.must_equal [1, 2]
 
       Comment.expects(:find_by_sql_without_kasket).never
       records = Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
       assert_equal(@comment_records, records.sort_by(&:id))
-    end
-
-    describe "modifying results" do
-      before do
-        Kasket.cache.write("#{Post.kasket_key_prefix}id=1", 'id' => 1, 'title' => "asd")
-        @sql = 'SELECT * FROM `posts` WHERE (id = 1)'
-        @record = Post.find_by_sql(@sql).first
-        assert_equal "asd", @record.title # read from cache ?
-        attributes = @record.instance_variable_get(:@attributes)
-        attributes = attributes.send(:attributes).instance_variable_get(:@values) unless attributes.is_a?(Hash)
-        attributes['id'] = 3
-      end
-
-      it "not impact other queries" do
-        same_record = Post.find_by_sql(@sql).first
-
-        assert_not_equal @record, same_record
-      end
     end
   end
 
@@ -97,10 +79,7 @@ describe Kasket::ReadMixin do
       post = Post.find(post.id)
       object = Kasket.cache.read("#{Post.kasket_key_prefix}id=#{post.id}")
 
-      actual = object["created_at"]
-      actual = object["created_at"].to_s(:db) if object["created_at"].is_a?(Time)
-
-      assert_equal "2013-10-14 15:30:00", actual, object["created_at"].class
+      assert_equal "2013-10-14 15:30:00", object.created_at.to_s(:db)
     end
   end
 
@@ -112,6 +91,15 @@ describe Kasket::ReadMixin do
     Timecop.travel(Time.now + 6.minutes) do
       ExpiringComment.find(1).updated_at.wont_equal old # cache expired
     end
+  end
+
+  it "does not store associations" do
+    post = Post.includes(:author).find(1)
+    # post.instance_variable_get(:@association_cache).size.must_equal 1
+
+    entry = Kasket.cache.send(:read_entry, "#{Post.kasket_key_prefix}id=#{post.id}", {})
+    entry.size.must_be :<=, 1300
+    entry.value.instance_variable_get(:@association_cache).size.must_equal 0
   end
 
   describe "pending saved records in a transaction" do
