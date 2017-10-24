@@ -35,7 +35,7 @@ By default, Kasket will cache each instance collection with a maximum length of 
 You can override this by passing the `:max_collection_size` option to the `Kasket.setup` call:
 
 ```ruby
-Kasket.setup(:max_collection_size => 50)
+Kasket.setup(max_collection_size: 50)
 ```
 
 #### Write-Through Caching
@@ -45,7 +45,7 @@ You can pass ':write_through => true' to the `Kasket.setup` call to get write-th
 semantics instead. In this mode, the model will be updated in the cache as well as the database.
 
 ```ruby
-Kasket.setup(:write_through => true)
+Kasket.setup(write_through: true)
 ```
 
 ## Configuring caching of your models
@@ -102,7 +102,7 @@ All Kasket cache keys contain the Kasket version number, so upgrading Kasket wil
 Sometimes caches like memcache can become incoherent. One layer of mitigation for this problem is to specify the maximum length a value may stay in cache before being expired and re-calculated. You can configure an optional default TTL value at setup:
 
 ```ruby
-Kasket.setup(:default_expires_in => 24.hours)
+Kasket.setup(default_expires_in: 24.hours)
 ```
 
 You can further specify per-model TTL values:
