@@ -55,7 +55,7 @@ describe "configuration mixin" do
         begin
           previous = Kasket::CONFIGURATION[:default_expires_in]
           Kasket::CONFIGURATION[:default_expires_in] = 86401
-          assert_equal 5.minutes, DefaultComment.kasket_ttl
+          assert_equal 86401, DefaultComment.kasket_ttl
         ensure
           Kasket::CONFIGURATION[:default_expires_in] = previous
         end
