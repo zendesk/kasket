@@ -11,7 +11,7 @@ rvm:
   - 2.2.7
   - 2.3.4
   - 2.4.2
-  - jruby
+  - jruby-9.1.9.0
 
 gemfile:
   - gemfiles/rails3.2.gemfile
@@ -25,9 +25,9 @@ matrix:
       gemfile: gemfiles/rails3.2.gemfile
     - rvm: 2.4.2
       gemfile: gemfiles/rails4.2.gemfile
-    - rvm: jruby
+    - rvm: jruby-9.1.9.0
       gemfile: gemfiles/rails5.0.gemfile
-    - rvm: jruby
+    - rvm: jruby-9.1.9.0
       gemfile: gemfiles/rails5.1.gemfile
   include:
     - rvm: 2.3.4
