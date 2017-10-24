@@ -42,4 +42,24 @@ describe "configuration mixin" do
       assert_equal "kasket-#{protocol}/R#{ar_version}/posts/version=#{POST_VERSION}/", Post.kasket_key_prefix
     end
   end
+
+  describe "kasket_ttl" do
+    describe "with an explicit TTL" do
+      it "returns the local TTL" do
+        assert_equal 5.minutes, ExpiringComment.kasket_ttl
+      end
+    end
+
+    describe "without an explicit TTL" do
+      it "falls back to the global" do
+        begin
+          previous = Kasket::CONFIGURATION[:default_expires_in]
+          Kasket::CONFIGURATION[:default_expires_in] = 86401
+          assert_equal 86401, DefaultComment.kasket_ttl
+        ensure
+          Kasket::CONFIGURATION[:default_expires_in] = previous
+        end
+      end
+    end
+  end
 end

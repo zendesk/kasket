@@ -34,8 +34,8 @@ This will include the required modules into ActiveRecord.
 By default, Kasket will cache each instance collection with a maximum length of 100.
 You can override this by passing the `:max_collection_size` option to the `Kasket.setup` call:
 
-```
-Kasket.setup(:max_collection_size => 50)
+```ruby
+Kasket.setup(max_collection_size: 50)
 ```
 
 #### Write-Through Caching
@@ -44,8 +44,8 @@ By default, when a model is saved, Kasket will invalidate cache entries by delet
 You can pass ':write_through => true' to the `Kasket.setup` call to get write-through cache
 semantics instead. In this mode, the model will be updated in the cache as well as the database.
 
-```
-Kasket.setup(:write_through => true)
+```ruby
+Kasket.setup(write_through: true)
 ```
 
 ## Configuring caching of your models
@@ -55,7 +55,7 @@ configuration.
 
 If you have an `Account` model, you can can do the simplest caching configuration like:
 
-```
+```ruby
 Account.has_kasket
 ```
 
@@ -65,7 +65,7 @@ All other calls (say, `Account.find_by_subdomain('zendesk')`) are untouched.
 
 If you wanted to configure a caching index on the subdomain attribute of the Account model, you would simply write
 
-```
+```ruby
 Account.has_kasket_on :subdomain
 ```
 
@@ -81,6 +81,7 @@ The goal of Kasket is to be as safe as possible to use, so the cache is expired 
 * When you save a model instance
 * When your database schema changes
 * When you install a new version of Kasket
+* After a global or per-model TTL
 * When you ask it to
 
 ### Cache expiry on instance save
@@ -96,12 +97,26 @@ If you somehow change your table schema, all cache entries for that table will a
 
 All Kasket cache keys contain the Kasket version number, so upgrading Kasket will expire all Kasket cache entries.
 
+### Cache expiry by TTL
+
+Sometimes caches like memcache can become incoherent. One layer of mitigation for this problem is to specify the maximum length a value may stay in cache before being expired and re-calculated. You can configure an optional default TTL value at setup:
+
+```ruby
+Kasket.setup(default_expires_in: 24.hours)
+```
+
+You can further specify per-model TTL values:
+
+```ruby
+Account.kasket_expires_in 5.minutes
+```
+
 ### Manually expiring caches
 
 If you have model methods that update the database behind the back of ActiveRecord, you need to mark these methods
 as being dirty.
 
-```
+```ruby
 Account.kasket_dirty_methods :update_last_action
 ```
 
