@@ -91,7 +91,10 @@ module Kasket
       @kasket_ttl = time
     end
 
-    attr_reader :kasket_ttl
+    def kasket_ttl
+      @kasket_ttl ||= nil
+      @kasket_ttl || Kasket::CONFIGURATION[:default_expires_in]
+    end
 
     private
 

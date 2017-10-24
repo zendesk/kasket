@@ -15,7 +15,11 @@ module Kasket
   autoload :SelectManagerMixin,     'kasket/select_manager_mixin'
   autoload :RelationMixin,          'kasket/relation_mixin'
 
-  CONFIGURATION = { max_collection_size: 100, write_through: false } # rubocop:disable Style/MutableConstant
+  CONFIGURATION = { # rubocop:disable Style/MutableConstant
+    max_collection_size: 100,
+    write_through:       false,
+    default_expires_in:  nil
+  }
 
   module_function
 
@@ -23,7 +27,8 @@ module Kasket
     return if ActiveRecord::Base.respond_to?(:has_kasket)
 
     CONFIGURATION[:max_collection_size] = options[:max_collection_size] if options[:max_collection_size]
-    CONFIGURATION[:write_through] = options[:write_through] if options[:write_through]
+    CONFIGURATION[:write_through]       = options[:write_through]       if options[:write_through]
+    CONFIGURATION[:default_expires_in]  = options[:default_expires_in]  if options[:default_expires_in]
 
     ActiveRecord::Base.extend(Kasket::ConfigurationMixin)
 
