@@ -1,4 +1,4 @@
-eval_gemfile('gemfiles/common.rb')
+eval_gemfile('./common.rb')
 
 gem 'activerecord', '~> 4.2.3'
 gem 'mysql2', platforms: :ruby
