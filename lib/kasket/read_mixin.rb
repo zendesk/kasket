@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module Kasket
   module ReadMixin
+    include Kasket::Instrumentation
+
     def self.extended(base)
       class << base
         alias_method :find_by_sql_without_kasket, :find_by_sql
@@ -27,7 +29,7 @@ module Kasket
         if query[:key].is_a?(Array)
           find_by_sql_with_kasket_on_id_array(query[:key])
         else
-          if value = Kasket.cache.read(query[:key])
+          if value = instrument('cache.read') { Kasket.cache.read(query[:key]) }
             if value.is_a?(Array)
               filter_pending_records(find_by_sql_with_kasket_on_id_array(value))
             else
@@ -43,7 +45,7 @@ module Kasket
     end
 
     def find_by_sql_with_kasket_on_id_array(keys)
-      key_attributes_map = Kasket.cache.read_multi(*keys)
+      key_attributes_map = instrument('cache.read_multi') { Kasket.cache.read_multi(*keys) }
 
       found_keys, missing_keys = keys.partition {|k| key_attributes_map[k] }
       found_keys.each {|k| key_attributes_map[k] = instantiate(key_attributes_map[k].dup) }
@@ -80,7 +82,7 @@ module Kasket
       elsif records.size <= Kasket::CONFIGURATION[:max_collection_size]
         if records.all?(&:kasket_cacheable?)
           instance_keys = records.map(&:store_in_kasket)
-          Kasket.cache.write(key, instance_keys)
+          instrument('cache.write') { Kasket.cache.write(key, instance_keys) }
         end
       end
       records

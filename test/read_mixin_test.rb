@@ -150,4 +150,27 @@ describe Kasket::ReadMixin do
       end
     end
   end
+
+  describe 'instrumentation' do
+    describe 'when a statsd client is configured' do
+      let(:statsd) { stub }
+
+      before do
+        statsd.stubs(:namespace)
+        statsd.stubs(:namespace=)
+        Kasket.statsd_client = statsd
+      end
+
+      after do
+        Kasket.statsd_client = nil
+      end
+
+      it 'instruments cache reads' do
+        statsd.expects(:time).with('cache.read', tags: ['model:Post'])
+        statsd.expects(:time).with('cache.write', tags: ['model:Post'])
+
+        Post.find(1)
+      end
+    end
+  end
 end

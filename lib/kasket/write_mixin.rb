@@ -21,6 +21,8 @@ module Kasket
     end
 
     module InstanceMethods
+      include Kasket::Instrumentation
+
       def kasket_key
         @kasket_key ||= new_record? ? nil : self.class.kasket_key_for_id(id)
       end
@@ -32,7 +34,7 @@ module Kasket
       def store_in_kasket(key = kasket_key)
         if kasket_cacheable? && key
           options = { expires_in: self.class.kasket_ttl } if self.class.kasket_ttl
-          Kasket.cache.write(key, attributes_before_type_cast.dup, options)
+          instrument('cache.write') { Kasket.cache.write(key, attributes_before_type_cast.dup, options) }
           key
         end
       end
