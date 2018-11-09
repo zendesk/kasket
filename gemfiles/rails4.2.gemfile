@@ -1,5 +1,5 @@
 eval_gemfile('./common.rb')
 
 gem 'activerecord', '~> 4.2.3'
-gem 'mysql2', platforms: :ruby
+gem 'mysql2'
 gem 'test_after_commit', '0.4.2'
