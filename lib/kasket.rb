@@ -14,6 +14,7 @@ module Kasket
   autoload :Visitor,                'kasket/visitor'
   autoload :SelectManagerMixin,     'kasket/select_manager_mixin'
   autoload :RelationMixin,          'kasket/relation_mixin'
+  autoload :Instrumentation,        'kasket/instrumentation'
 
   CONFIGURATION = { # rubocop:disable Style/MutableConstant
     max_collection_size: 100,
@@ -59,5 +60,14 @@ module Kasket
 
   def self.clear_pending_records
     Thread.current[:kasket_pending_records] = nil
+  end
+
+  def self.statsd_client
+    @statsd_client
+  end
+
+  def self.statsd_client=(client)
+    client.namespace ||= 'kasket' if client
+    @statsd_client = client
   end
 end
