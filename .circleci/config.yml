@@ -1,0 +1,110 @@
+version: 2
+
+jobs:
+
+  # Ruby 2.3
+  test-2.3-with-4.2:
+    docker:
+      - image: circleci/ruby:2.3
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails4.2.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+  test-2.3-with-5.1:
+    docker:
+      - image: circleci/ruby:2.3
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails5.1.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+
+  # Ruby 2.4
+  test-2.4-with-4.2:
+    docker:
+      - image: circleci/ruby:2.4
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails4.2.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+  test-2.4-with-5.1:
+    docker:
+      - image: circleci/ruby:2.4
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails5.1.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+
+  # Ruby 2.5
+  test-2.5-with-4.2:
+    docker:
+      - image: circleci/ruby:2.5
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails4.2.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+  test-2.5-with-5.1:
+    docker:
+      - image: circleci/ruby:2.5
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails5.1.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+
+  # JRuby
+  test-jruby-with-4.2:
+    docker:
+      - image: circleci/jruby:9.1
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails4.2.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+
+  # RuboCop
+  rubocop:
+    docker:
+      - image: circleci/ruby
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails5.1.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rubocop
+
+workflows:
+  version: 2
+  build:
+    jobs:
+
+      - test-2.3-with-4.2
+      - test-2.3-with-5.1
+
+      - test-2.4-with-4.2
+      - test-2.4-with-5.1
+
+      - test-2.5-with-4.2
+      - test-2.5-with-5.1
+
+      - test-jruby-with-4.2
+
+      - rubocop
