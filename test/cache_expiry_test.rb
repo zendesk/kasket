@@ -86,12 +86,12 @@ describe "cache expiry" do
       it "is updated in cache when updated" do
         @post.title = "new_title"
         @post.save!
-        assert_equal @post.attributes, Kasket.cache.read(@post.kasket_key)
+        assert_equal @post, Kasket.cache.read(@post.kasket_key)
       end
 
       it "is updated in cache when touched" do
         @post.touch
-        assert_equal @post.attributes, Kasket.cache.read(@post.kasket_key)
+        assert_equal @post, Kasket.cache.read(@post.kasket_key)
       end
 
       it "writes id key and clears indices for instance when updated" do
