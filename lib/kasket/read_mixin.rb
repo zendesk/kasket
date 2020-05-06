@@ -76,7 +76,7 @@ module Kasket
       if records.size == 1
         records.first.store_in_kasket(key)
       elsif records.empty?
-        ActiveRecord::Base.logger.info("[KASKET] would have stored an empty resultset") if ActiveRecord::Base.logger
+        ActiveRecord::Base.logger.debug("[KASKET] would have stored an empty resultset") if ActiveRecord::Base.logger
       elsif records.size <= Kasket::CONFIGURATION[:max_collection_size]
         if records.all?(&:kasket_cacheable?)
           instance_keys = records.map(&:store_in_kasket)
