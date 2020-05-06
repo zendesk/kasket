@@ -71,7 +71,7 @@ jobs:
   # JRuby
   test-jruby-with-4.2:
     docker:
-      - image: circleci/jruby:9.1
+      - image: circleci/jruby:9.2
       - image: circleci/mysql:5.7
     environment:
       BUNDLE_GEMFILE: gemfiles/rails4.2.gemfile
