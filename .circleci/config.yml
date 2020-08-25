@@ -57,6 +57,17 @@ jobs:
       - run: bundle install
       - run: bundle exec rake test
 
+  test-2.5-with-6.0:
+    docker:
+      - image: circleci/ruby:2.5
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails6.0.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+
   # Ruby 2.6
   test-2.6-with-5.1:
     docker:
@@ -75,6 +86,17 @@ jobs:
       - image: circleci/mysql:5.7
     environment:
       BUNDLE_GEMFILE: gemfiles/rails5.2.gemfile
+    steps:
+      - checkout
+      - run: bundle install
+      - run: bundle exec rake test
+
+  test-2.6-with-6.0:
+    docker:
+      - image: circleci/ruby:2.6
+      - image: circleci/mysql:5.7
+    environment:
+      BUNDLE_GEMFILE: gemfiles/rails6.0.gemfile
     steps:
       - checkout
       - run: bundle install
@@ -113,10 +135,12 @@ workflows:
 
       - test-2.5-with-4.2
       - test-2.5-with-5.1
-      - test-2.6-with-5.1
+      - test-2.6-with-5.2
+      - test-2.6-with-6.0
 
       - test-2.6-with-5.1
       - test-2.6-with-5.2
+      - test-2.6-with-6.0
 
       - test-jruby-with-4.2
 

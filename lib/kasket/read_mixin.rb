@@ -16,7 +16,7 @@ module Kasket
           if ActiveRecord::VERSION::MAJOR < 5
             sql.to_kasket_query(self, args[1])
           else
-            if ActiveRecord::VERSION::MINOR < 2
+            if ActiveRecord::VERSION::STRING < '5.2'
               sql.to_kasket_query(self, args[1].map(&:value_for_database))
             else
               sql.to_kasket_query(self)

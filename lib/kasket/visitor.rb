@@ -123,7 +123,7 @@ module Kasket
       if ActiveRecord::VERSION::MAJOR < 5
         visit(@binds.shift[1])
       else
-        if ActiveRecord::VERSION::MINOR < 2
+        if ActiveRecord::VERSION::STRING < '5.2'
           visit(@binds.shift)
         else
           visit(node.value.value) unless node.value.value.nil?
