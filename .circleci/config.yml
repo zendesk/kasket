@@ -102,18 +102,6 @@ jobs:
       - run: bundle install
       - run: bundle exec rake test
 
-  # JRuby
-  test-jruby-with-4.2:
-    docker:
-      - image: circleci/jruby:9.1
-      - image: circleci/mysql:5.7
-    environment:
-      BUNDLE_GEMFILE: gemfiles/rails4.2.gemfile
-    steps:
-      - checkout
-      - run: bundle install
-      - run: bundle exec rake test
-
   # RuboCop
   rubocop:
     docker:
@@ -141,7 +129,5 @@ workflows:
       - test-2.6-with-5.1
       - test-2.6-with-5.2
       - test-2.6-with-6.0
-
-      - test-jruby-with-4.2
 
       - rubocop
