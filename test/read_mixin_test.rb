@@ -107,10 +107,10 @@ describe Kasket::ReadMixin do
   it "expires the cache when the expires_in option is set" do
     old = ExpiringComment.find(1).updated_at
     ExpiringComment.where(id: 1).update_all(updated_at: Time.now + 10.seconds)
-    ExpiringComment.find(1).updated_at.must_equal old # caching works
+    assert_equal ExpiringComment.find(1).updated_at, old # caching works
 
     Timecop.travel(Time.now + 6.minutes) do
-      ExpiringComment.find(1).updated_at.wont_equal old # cache expired
+      assert ExpiringComment.find(1).updated_at != old # cache expired
     end
   end
 
@@ -133,9 +133,9 @@ describe Kasket::ReadMixin do
     end
 
     it "finds cached when searching by column" do
-      Post.where(title: 'no_comments').first.title.must_equal 'no_comments'
+      assert_equal Post.where(title: 'no_comments').first.title, 'no_comments'
       Post.expects(:find_by_sql_without_kasket).never
-      Post.where(title: 'no_comments').first.title.must_equal 'no_comments'
+      assert_equal Post.where(title: 'no_comments').first.title, 'no_comments'
     end
 
     it "returns nothing if object destroyed" do

@@ -23,7 +23,7 @@ describe Kasket::Visitor do
 
   it "builds select Bignum" do
     num = 9223372036854775807
-    Post.where(big_id: num).to_kasket_query.fetch(:attributes).must_equal([[:big_id, num.to_s]])
+    assert_equal Post.where(big_id: num).to_kasket_query.fetch(:attributes), [[:big_id, num.to_s]]
   end
 
   it "builds with nil values" do
