@@ -37,7 +37,7 @@ module Kasket
       else
         key = attribute_value_pairs.map do |attribute, value|
           column = columns_hash[attribute.to_s]
-          value = nil if value.blank?
+          value = nil if value.blank? && value != false
           "#{attribute}=#{kasket_quoted_value_for_column(value, column)}"
         end.join('/')
 

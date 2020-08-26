@@ -119,11 +119,15 @@ module Kasket
       end
     end
 
-    def visit_Arel_Nodes_BindParam(_x, *_)
+    def visit_Arel_Nodes_BindParam(node, *_)
       if ActiveRecord::VERSION::MAJOR < 5
         visit(@binds.shift[1])
       else
-        visit(@binds.shift)
+        if ActiveRecord::VERSION::STRING < '5.2'
+          visit(@binds.shift)
+        else
+          visit(node.value.value) unless node.value.value.nil?
+        end
       end
     end
 

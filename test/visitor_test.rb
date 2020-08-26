@@ -23,7 +23,7 @@ describe Kasket::Visitor do
 
   it "builds select Bignum" do
     num = 9223372036854775807
-    Post.where(big_id: num).to_kasket_query.fetch(:attributes).must_equal([[:big_id, num.to_s]])
+    assert_equal Post.where(big_id: num).to_kasket_query.fetch(:attributes), [[:big_id, num.to_s]]
   end
 
   it "builds with nil values" do
@@ -52,7 +52,7 @@ describe Kasket::Visitor do
       attributes: [[:public, 1]],
       from: "comments",
       index: [:public],
-      key: "#{DefaultComment.kasket_key_prefix}public=1"
+      key: "#{DefaultComment.kasket_key_prefix}public=#{ActiveRecord::VERSION::STRING < '5.2' ? "1" : "true"}"
     }
     assert_equal expected, DefaultComment.unscoped.where(public: true).to_kasket_query
 
@@ -60,7 +60,7 @@ describe Kasket::Visitor do
       attributes: [[:public, 0]],
       from: "comments",
       index: [:public],
-      key: "#{DefaultComment.kasket_key_prefix}public=0"
+      key: "#{DefaultComment.kasket_key_prefix}public=#{ActiveRecord::VERSION::STRING < '5.2' ? "0" : "false"}"
     }
     assert_equal expected, DefaultComment.unscoped.where(public: false).to_kasket_query
   end
