@@ -72,6 +72,6 @@ module Rails
   end
 end
 
-require './test/test_models'
+require_relative './test_models'
 POST_VERSION = Post.column_names.join.sum
 COMMENT_VERSION = Comment.column_names.join.sum
