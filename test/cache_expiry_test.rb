@@ -39,7 +39,7 @@ describe "cache expiry" do
 
     it "loads a fresh copy when reload is called" do
       Post.where(id: @post.id).update_all(title: 'sneaky')
-      @post.reload.title.must_equal 'sneaky'
+      assert_equal @post.reload.title, 'sneaky'
     end
 
     it "clears all indices for instance when updated" do
