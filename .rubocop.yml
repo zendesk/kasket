@@ -1,15 +1,18 @@
 AllCops:
   DisplayCopNames: true
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.5
   Exclude:
     - vendor/**/*
     - gemfiles/vendor/**/*
     - tmp/**/*
 
+Layout/LineLength:
+  Max: 170
+
 Bundler/OrderedGems:
   Enabled: false
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 
 Layout/CommentIndentation:
@@ -24,10 +27,10 @@ Layout/EmptyLineAfterMagicComment:
 Layout/FirstParameterIndentation:
   EnforcedStyle: consistent
 
-Layout/IndentArray:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
 
-Layout/IndentHash:
+Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 
 Layout/MultilineMethodCallIndentation:
@@ -51,7 +54,7 @@ Lint/AssignmentInCondition:
 Lint/AmbiguousOperator:
   Enabled: false
 
-Lint/EndAlignment:
+Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 
 Lint/ShadowingOuterLocalVariable:
@@ -95,7 +98,7 @@ Style/IfUnlessModifier:
 Style/Lambda:
   Enabled: false
 
-Style/MethodName:
+Naming/MethodName:
   Exclude:
     - lib/kasket/visitor.rb
 
@@ -111,7 +114,7 @@ Style/NumericPredicate:
 Style/PerlBackrefs:
   Enabled: false
 
-Style/PredicateName:
+Naming/PredicateName:
   Enabled: false
 
 # for single `/` more readable
@@ -146,10 +149,13 @@ Style/SymbolArray:
 Style/TernaryParentheses:
   Enabled: false
 
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
   Enabled: false
 
-Style/VariableNumber:
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+
+Naming/VariableNumber:
   Enabled: false
 
 Style/WordArray:

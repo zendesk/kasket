@@ -6,8 +6,8 @@ module Kasket
     # SELECT * FROM `users` WHERE (`users`.`id` = 2) LIMIT 1
     # 'SELECT * FROM \'posts\' WHERE (\'posts\'.\'id\' = 574019247) '
 
-    AND = /\s+AND\s+/i
-    VALUE = /'?(\d+|\?|(?:(?:[^']|''|\\')*))'?/ # Matches: 123, ?, '123', '12''3'
+    AND = /\s+AND\s+/i.freeze
+    VALUE = /'?(\d+|\?|(?:(?:[^']|''|\\')*))'?/.freeze # Matches: 123, ?, '123', '12''3'
 
     def initialize(model_class)
       @model_class = model_class
