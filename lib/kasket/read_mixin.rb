@@ -8,6 +8,7 @@ module Kasket
       end
     end
 
+    # *args can be replaced with (sql, *args) once we stop supporting Rails < 5.2
     def find_by_sql_with_kasket(*args)
       sql = args[0]
 
