@@ -52,13 +52,11 @@ describe "configuration mixin" do
 
     describe "without an explicit TTL" do
       it "falls back to the global" do
-        begin
-          previous = Kasket::CONFIGURATION[:default_expires_in]
-          Kasket::CONFIGURATION[:default_expires_in] = 86401
-          assert_equal 86401, DefaultComment.kasket_ttl
-        ensure
-          Kasket::CONFIGURATION[:default_expires_in] = previous
-        end
+        previous = Kasket::CONFIGURATION[:default_expires_in]
+        Kasket::CONFIGURATION[:default_expires_in] = 86401
+        assert_equal 86401, DefaultComment.kasket_ttl
+      ensure
+        Kasket::CONFIGURATION[:default_expires_in] = previous
       end
     end
   end

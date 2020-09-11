@@ -17,8 +17,8 @@ module Kasket
 
   CONFIGURATION = { # rubocop:disable Style/MutableConstant
     max_collection_size: 100,
-    write_through:       false,
-    default_expires_in:  nil
+    write_through: false,
+    default_expires_in: nil
   }
 
   module_function
@@ -33,8 +33,8 @@ module Kasket
     ActiveRecord::Base.extend(Kasket::ConfigurationMixin)
 
     if defined?(ActiveRecord::Relation)
-      ActiveRecord::Relation.send(:include, Kasket::RelationMixin)
-      Arel::SelectManager.send(:include, Kasket::SelectManagerMixin)
+      ActiveRecord::Relation.include Kasket::RelationMixin
+      Arel::SelectManager.include Kasket::SelectManagerMixin
     end
   end
 
@@ -42,8 +42,13 @@ module Kasket
     @cache_store = ActiveSupport::Cache.lookup_store(options)
   end
 
-  def self.cache
+  def self.cache_store
     @cache_store ||= Rails.cache
+  end
+
+  # Alias cache_store to cache
+  class << self
+    alias_method :cache, :cache_store
   end
 
   # Keys are the records being saved.

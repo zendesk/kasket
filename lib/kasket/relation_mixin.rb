@@ -10,7 +10,7 @@ module Kasket
         end
       end
     rescue TypeError # unsupported object in ast
-      return nil
+      nil
     end
   end
 end

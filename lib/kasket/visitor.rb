@@ -75,6 +75,7 @@ module Kasket
     def visit_Arel_Nodes_JoinSource(node, *_)
       return :unsupported if !node.left || node.right.any?
       return :unsupported unless node.left.is_a?(Arel::Table)
+
       visit(node.left)
     end
 
@@ -85,6 +86,7 @@ module Kasket
     def visit_Arel_Nodes_And(node, *_)
       attributes = node.children.map { |child| visit(child) }
       return :unsupported if attributes.include?(:unsupported)
+
       attributes.sort! { |pair1, pair2| pair1[0].to_s <=> pair2[0].to_s }
       { attributes: attributes }
     end
