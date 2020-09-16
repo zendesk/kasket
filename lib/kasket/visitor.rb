@@ -3,6 +3,7 @@ require 'arel'
 
 module Kasket
   class Visitor < Arel::Visitors::Visitor
+    # binds can be removed once we stop supporting Rails < 5.2
     def initialize(model_class, binds)
       @model_class = model_class
       @binds       = binds.dup
@@ -114,8 +115,12 @@ module Kasket
     end
 
     def literal(node, *_)
-      if node == '?'
-        @binds.shift.last.to_s
+      if ActiveRecord::VERSION::STRING < '5.2'
+        if node == '?'
+          @binds.shift.last.to_s
+        else
+          node.to_s
+        end
       else
         node.to_s
       end
@@ -137,11 +142,13 @@ module Kasket
       node.map {|value| visit(value) }
     end
 
-    def visit_Arel_Nodes_Casted(node, *_)
-      case node.val
-      when nil    then nil
-      when String then node.val
-      else quoted(node.val)
+    if ActiveRecord::VERSION::STRING < '5.2'
+      def visit_Arel_Nodes_Casted(node, *_)
+        case node.val
+        when nil    then nil
+        when String then node.val
+        else quoted(node.val)
+        end
       end
     end
 

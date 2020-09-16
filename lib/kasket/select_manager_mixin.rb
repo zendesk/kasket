@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 module Kasket
   module SelectManagerMixin
+    # binds can be removed once we stop supporting Rails < 5.2
     def to_kasket_query(klass, binds = [])
       begin
         query = Kasket::Visitor.new(klass, binds).accept(ast)
