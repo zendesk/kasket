@@ -111,4 +111,126 @@ describe "cache expiry" do
       end
     end
   end
+
+  describe 'a cached association' do
+    let(:post) do
+      posts(:has_two_comments)
+    end
+
+    let(:comment1) do
+      comments(:few_comments_1)
+    end
+
+    let(:comment2) do
+      comments(:few_comments_2)
+    end
+
+    it 'has two comments' do
+      assert_equal post.comments, [comment1, comment2]
+    end
+
+    describe 'when loaded and then deleted' do
+      before do
+        post.comments
+        comment1.delete
+      end
+
+      it 'retains two comments' do
+        assert_equal post.comments, [comment1, comment2]
+      end
+
+      it 'reflects updates after reload' do
+        assert_equal post.reload.comments, [comment2]
+      end
+    end
+
+    describe 'when loaded and then destroyed' do
+      before do
+        post.comments
+        comment2.delete
+      end
+
+      it 'retains two comments' do
+        assert_equal post.comments, [comment1, comment2]
+      end
+
+      it 'reflects updates after reload' do
+        assert_equal post.reload.comments, [comment1]
+      end
+    end
+
+    describe 'when deleted via the collection' do
+      before do
+        post.comments.delete(comment1)
+      end
+
+      it 'removes comment' do
+        assert_equal post.comments, [comment2]
+      end
+
+      it 'reflects updates after reload' do
+        assert_equal post.reload.comments, [comment2]
+      end
+    end
+
+    describe 'when destroyed via the collection' do
+      before do
+        post.comments.destroy(comment2)
+      end
+
+      it 'removes comment' do
+        assert_equal post.comments, [comment1]
+      end
+
+      it 'reflects updates after reload' do
+        assert_equal post.reload.comments, [comment1]
+      end
+    end
+
+    describe 'when all destroyed via the collection' do
+      before do
+        post.comments.destroy_all
+      end
+
+      it 'removes all comments' do
+        assert_equal post.comments, []
+      end
+
+      it 'reflects updates after reload' do
+        assert_equal post.reload.comments, []
+      end
+    end
+
+    describe 'when deleted and parent is updated' do
+      before do
+        post.comments
+        comment1.delete
+        post.touch
+      end
+
+      it 'reflects changes' do
+        assert_equal post.comments, [comment2]
+      end
+
+      it 'reflects updates after reload' do
+        assert_equal post.reload.comments, [comment2]
+      end
+    end
+
+    describe 'when destroyed and parent is updated' do
+      before do
+        post.comments
+        comment2.destroy
+        post.touch
+      end
+
+      it 'reflects changes' do
+        assert_equal post.comments, [comment1]
+      end
+
+      it 'reflects updates after reload' do
+        assert_equal post.reload.comments, [comment1]
+      end
+    end
+  end
 end
