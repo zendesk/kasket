@@ -66,7 +66,7 @@ describe "find some" do
     assert_equal [@post1, @post2].map(&:id).sort, found_posts.map(&:id).sort
   end
 
-  it "does not raise error when set to false" do
+  it "does not raise error when cache is poisoned with TrueClass" do
     post = Post.first
     Kasket.cache.write(post.kasket_key, true) # This used to kerplunk things when AWS elasticcache rebooted
 
