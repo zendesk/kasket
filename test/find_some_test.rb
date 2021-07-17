@@ -75,7 +75,7 @@ describe "find some" do
       Kasket::CONFIGURATION[:dalli_allow_true_class_response] = true # default value
     end
 
-    it "Does not raise error when dalli_allow_true_class_response set to false explicitly" do
+    it "does not raise error when set to false" do
       post = Post.first
       Kasket.cache.write(post.kasket_key, true)
 
