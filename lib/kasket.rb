@@ -18,7 +18,8 @@ module Kasket
   CONFIGURATION = { # rubocop:disable Style/MutableConstant
     max_collection_size: 100,
     write_through: false,
-    default_expires_in: nil
+    default_expires_in: nil,
+    dalli_allow_true_class_response: true
   }
 
   module_function
@@ -29,6 +30,7 @@ module Kasket
     CONFIGURATION[:max_collection_size] = options[:max_collection_size] if options[:max_collection_size]
     CONFIGURATION[:write_through]       = options[:write_through]       if options[:write_through]
     CONFIGURATION[:default_expires_in]  = options[:default_expires_in]  if options[:default_expires_in]
+    CONFIGURATION[:dalli_allow_true_class_response] = options[:dalli_allow_true_class_response] if options[:dalli_allow_true_class_response]
 
     ActiveRecord::Base.extend(Kasket::ConfigurationMixin)
 

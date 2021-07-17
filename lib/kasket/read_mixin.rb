@@ -33,7 +33,17 @@ module Kasket
           find_by_sql_with_kasket_on_id_array(query[:key])
         else
           if value = Kasket.cache.read(query[:key])
-            if value.is_a?(Array)
+            # Identified a specific edge case where memcached server returns 0x00 binary protocol response with no data
+            # when the node is being rebooted which causes the Dalli memcached client to return a TrueClass object instead of nil
+            # see: https://github.com/petergoldstein/dalli/blob/31dabf19d3dd94b348a00a59fe5a7b8fa80ce3ad/lib/dalli/server.rb#L520
+            # and: https://github.com/petergoldstein/dalli/issues/390
+            #
+            # The kasket configuration will default to true which will allow these objects to be handled and passed up to
+            # ActiveRecord just like they always have been.  Overriding this in the Kasket.setup with a value of false will
+            # skip the kasket cache for these specific objects and go directly to SQL.
+            if value.is_a?(TrueClass) && !Kasket::CONFIGURATION[:dalli_allow_true_class_response]
+              find_by_sql_without_kasket(*args)
+            elsif value.is_a?(Array)
               filter_pending_records(find_by_sql_with_kasket_on_id_array(value))
             else
               filter_pending_records(Array.wrap(value).collect { |record| instantiate(record.dup) })
