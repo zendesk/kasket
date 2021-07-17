@@ -30,7 +30,7 @@ module Kasket
     CONFIGURATION[:max_collection_size] = options[:max_collection_size] if options[:max_collection_size]
     CONFIGURATION[:write_through]       = options[:write_through]       if options[:write_through]
     CONFIGURATION[:default_expires_in]  = options[:default_expires_in]  if options[:default_expires_in]
-    CONFIGURATION[:dalli_allow_true_class_response] = options[:dalli_allow_true_class_response] if options[:dalli_allow_true_class_response]
+    CONFIGURATION[:dalli_allow_true_class_response] = !!options[:dalli_allow_true_class_response] if options.key?(:dalli_allow_true_class_response)
 
     ActiveRecord::Base.extend(Kasket::ConfigurationMixin)
 
