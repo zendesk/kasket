@@ -38,10 +38,9 @@ module Kasket
             # see: https://github.com/petergoldstein/dalli/blob/31dabf19d3dd94b348a00a59fe5a7b8fa80ce3ad/lib/dalli/server.rb#L520
             # and: https://github.com/petergoldstein/dalli/issues/390
             #
-            # The kasket configuration will default to true which will allow these objects to be handled and passed up to
-            # ActiveRecord just like they always have been.  Overriding this in the Kasket.setup with a value of false will
-            # skip the kasket cache for these specific objects and go directly to SQL.
-            if value.is_a?(TrueClass) && !Kasket::CONFIGURATION[:dalli_allow_true_class_response]
+            # The code in this first condition of TrueClass === true  will
+            # skip the kasket cache for these specific objects and go directly to SQL for retrieval.
+            if value.is_a?(TrueClass)
               find_by_sql_without_kasket(*args)
             elsif value.is_a?(Array)
               filter_pending_records(find_by_sql_with_kasket_on_id_array(value))

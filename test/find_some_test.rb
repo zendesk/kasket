@@ -66,35 +66,15 @@ describe "find some" do
     assert_equal [@post1, @post2].map(&:id).sort, found_posts.map(&:id).sort
   end
 
-  describe "with dalli_allow_true_class_response" do
-    before do
-      Kasket::CONFIGURATION[:dalli_allow_true_class_response] = true # default value
-    end
+  it "does not raise error when set to false" do
+    post = Post.first
+    Kasket.cache.write(post.kasket_key, true) # This used to kerplunk things when AWS elasticcache rebooted
 
-    after do
-      Kasket::CONFIGURATION[:dalli_allow_true_class_response] = true # default value
-    end
+    assert_equal(true, Kasket.cache.read(post.kasket_key))
 
-    it "does not raise error when set to false" do
-      post = Post.first
-      Kasket.cache.write(post.kasket_key, true)
-
-      assert_equal(true, Kasket.cache.read(post.kasket_key))
-      Kasket::CONFIGURATION[:dalli_allow_true_class_response] = false
-      p = Post.find(post.id)
-      assert_equal(p, post)
-      assert_equal(true, Kasket.cache.read(post.kasket_key))
-    end
-
-    it "raise error when dalli_allow_true_class_response set to true explicitly" do
-      post = Post.first
-      Kasket.cache.write(post.kasket_key, true)
-      assert_equal(true, Kasket.cache.read(post.kasket_key))
-
-      assert_raise NoMethodError do
-        Post.find(post.id)
-      end
-    end
+    p = Post.find(post.id)
+    assert_equal(p, post)
+    assert_equal(true, Kasket.cache.read(post.kasket_key))
   end
 
   describe "unfound" do
