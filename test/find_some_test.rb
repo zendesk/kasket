@@ -66,7 +66,7 @@ describe "find some" do
     assert_equal [@post1, @post2].map(&:id).sort, found_posts.map(&:id).sort
   end
 
-  describe "tests dalli_allow_true_class_response" do
+  describe "with dalli_allow_true_class_response" do
     before do
       Kasket::CONFIGURATION[:dalli_allow_true_class_response] = true # default value
     end
