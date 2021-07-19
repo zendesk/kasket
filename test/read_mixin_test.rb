@@ -40,6 +40,115 @@ describe Kasket::ReadMixin do
       assert_equal @post_records, Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
     end
 
+    describe "instrumentation" do
+      let(:callback) do
+        lambda do |*args|
+          event = ActiveSupport::Notifications::Event.new(*args)
+
+          @notification_received = true
+          @payload = event.payload
+          @record_count = event.payload[:record_count]
+          @class_name = event.payload[:class_name]
+        end
+      end
+
+      before do
+        @notification_received = false
+        @payload = nil
+        @record_count = 0
+        @class_name = ""
+      end
+
+      describe "a single record" do
+        before do
+          Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
+        end
+
+        it "does not call the db" do
+          Post.expects(:find_by_sql_without_kasket).never
+
+          Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+        end
+
+        it "sends an ActiveSupport::Notification" do
+          ActiveSupport::Notifications.subscribed(callback, 'instantiation.active_record') do
+            Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+          end
+
+          assert @notification_received
+          assert_equal 1, @record_count
+          assert_equal "Post", @class_name
+        end
+      end
+
+      describe "an array of records" do
+        let(:posts) { ["#{Post.kasket_key_prefix}id=1", "#{Post.kasket_key_prefix}id=2"] }
+
+        before do
+          Kasket.cache.write("#{Comment.kasket_key_prefix}post_id=1", posts)
+        end
+
+        it "does not call the db" do
+          Comment.expects(:find_by_sql_without_kasket).never
+
+          Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
+        end
+
+        it "sends an ActiveSupport::Notification" do
+          ActiveSupport::Notifications.subscribed(callback, 'instantiation.active_record') do
+            Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
+          end
+
+          assert @notification_received
+          assert_equal 2, @record_count
+          assert_equal "Comment", @class_name
+        end
+      end
+
+      describe "a cache miss" do
+        it "calls the db" do
+          Post.expects(:find_by_sql_without_kasket).once.returns(@post_records)
+
+          Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+        end
+
+        it "does not send a notification" do
+          Post.stubs(:find_by_sql_without_kasket).returns(@post_records)
+
+          ActiveSupport::Notifications.subscribed(callback, 'instantiation.active_record') do
+            Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+          end
+
+          refute @notification_received
+          assert_equal 0, @record_count
+          assert_equal "", @class_name
+        end
+      end
+
+      it "emits the same payload as rails" do
+        Post.unstub(:find_by_sql_without_kasket)
+
+        ActiveSupport::Notifications.subscribed(callback, 'instantiation.active_record') do
+          Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+        end
+
+        assert @notification_received
+        rails_payload = @payload
+        @notification_received = false
+        @payload = nil
+
+        Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
+        Post.expects(:find_by_sql_without_kasket).never
+
+        ActiveSupport::Notifications.subscribed(callback, 'instantiation.active_record') do
+          Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+        end
+
+        assert @notification_received
+        assert_equal rails_payload, @payload
+      end
+    end
+
     it "support sql with ?" do
       Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
       assert_equal @post_records, Post.find_by_sql(['SELECT * FROM `posts` WHERE (id = ?)', 1])
