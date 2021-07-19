@@ -66,6 +66,17 @@ describe "find some" do
     assert_equal [@post1, @post2].map(&:id).sort, found_posts.map(&:id).sort
   end
 
+  it "does not raise error when cache is poisoned with TrueClass" do
+    post = Post.first
+    Kasket.cache.write(post.kasket_key, true) # This used to kerplunk things when AWS elasticcache rebooted
+
+    assert_equal(true, Kasket.cache.read(post.kasket_key))
+
+    p = Post.find(post.id)
+    assert_equal(p, post)
+    assert_equal(true, Kasket.cache.read(post.kasket_key))
+  end
+
   describe "unfound" do
     it "ignore unfound when using find_all_by_id" do
       found_posts = Post.where(id: [@post1.id, 1231232]).to_a
