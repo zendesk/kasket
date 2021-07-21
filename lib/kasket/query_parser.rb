@@ -12,26 +12,43 @@ module Kasket
     def initialize(model_class)
       @model_class = model_class
 
-      @supported_query_pattern = /^select\s+((?:`|")#{@model_class.table_name}(?:`|")\.)?\* from (?:`|")#{@model_class.table_name}(?:`|") where (.*?)(|\s+limit 1)\s*$/i
+      @supported_query_pattern = /^select\s+(.+?)\s+from (?:`|")#{@model_class.table_name}(?:`|") where (.*?)(|\s+limit 1)\s*$/i
 
+      @star_pattern = /^((`|")#{@model_class.table_name}\2\.)?\*$/
       # Matches: `users`.id, `users`.`id`, users.id, id
       @table_and_column_pattern = /(?:(?:`|")?#{@model_class.table_name}(?:`|")?\.)?(?:`|")?([a-zA-Z]\w*)(?:`|")?/
       # Matches: KEY = VALUE, (KEY = VALUE), ()(KEY = VALUE))
       @key_eq_value_pattern = /^[\(\s]*#{@table_and_column_pattern}\s+(=|IN)\s+#{VALUE}[\)\s]*$/
     end
 
+    ##
+    # Parses a SQL query to produce a kasket query
+    #
+    # @param sql [String] the sql query to parse
+    # @return [Hash|nil] the kasket query, or nil if the sql query is not supported
     def parse(sql)
       if match = @supported_query_pattern.match(sql)
+        select = match[1]
+        unless @star_pattern.match? select
+          # If we're not selecting all columns using star, then ensure all columns are selected explicitly
+          select_columns = select.split(/\s*,\s*/).map do |s|
+            break unless column_match = @table_and_column_pattern.match(s)
+
+            column_match[1]
+          end.uniq
+          columns = @model_class.column_names
+          return unless columns.size == select_columns.size && (columns - select_columns).empty?
+        end
         where = match[2]
         limit = match[3]
 
         query = {}
         query[:attributes] = sorted_attribute_value_pairs(where)
-        return nil if query[:attributes].nil?
+        return if query[:attributes].nil?
 
         if query[:attributes].size > 1 && query[:attributes].map(&:last).any?(Array)
           # this is a query with IN conditions AND other conditions
-          return nil
+          return
         end
 
         query[:index] = query[:attributes].map(&:first)
