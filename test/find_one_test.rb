@@ -4,6 +4,14 @@ require_relative "helper"
 describe "find one" do
   fixtures :blogs, :posts
 
+  def assert_key(key)
+    assert Kasket.cache.read(key), "Expected Kasket cache to contain a value for the key #{key}"
+  end
+
+  def refute_key(key)
+    assert_nil Kasket.cache.read(key), "Expected Kasket cache not to contain a value for the key #{key}"
+  end
+
   it "cache find(id) calls" do
     post = Post.first
     Kasket.cache.write(post.kasket_key, nil)
@@ -27,13 +35,13 @@ describe "find one" do
 
   it "not use cache when using the :select option" do
     post = Post.first
-    assert_nil(Kasket.cache.read(post.kasket_key))
+    refute_key post.kasket_key
 
     Post.select('title').find(post.id)
-    assert_nil(Kasket.cache.read(post.kasket_key))
+    refute_key post.kasket_key
 
     Post.find(post.id)
-    assert(Kasket.cache.read(post.kasket_key))
+    assert_key post.kasket_key
 
     Kasket.cache.expects(:read)
     Post.find(post.id)
@@ -42,11 +50,29 @@ describe "find one" do
     Post.select('title').find(post.id)
   end
 
+  it "uses cache when using the :select option with all columns" do
+    post = Post.first
+    refute_key post.kasket_key
+
+    Post.select(Post.column_names).find(post.id)
+    assert_key post.kasket_key
+  end
+
+  if ActiveRecord::VERSION::STRING >= '5.0.0'
+    it "doesn't use cache when using the :select option with all columns including ignored columns" do
+      post = Post.first
+      refute_key post.kasket_key
+
+      Post.select(Post.column_names + Post.ignored_columns).find(post.id)
+      refute_key post.kasket_key
+    end
+  end
+
   it "respect scope" do
     post = Post.find(Post.first.id)
     other_blog = Blog.where("id != #{post.blog_id}").first
 
-    assert(Kasket.cache.read(post.kasket_key))
+    assert_key post.kasket_key
 
     assert_raise(ActiveRecord::RecordNotFound) do
       other_blog.posts.find(post.id)
@@ -60,7 +86,7 @@ describe "find one" do
 
     post = blog.posts.find(post.id)
     key  = post.kasket_key.sub(%r{(/id=#{post.id})}, "/blog_id=#{Blog.first.id}\\1")
-    assert(Kasket.cache.read(key))
+    assert_key key
   end
 
   it "uses different caches when being unscoped" do

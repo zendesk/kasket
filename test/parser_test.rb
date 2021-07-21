@@ -71,6 +71,24 @@ describe Kasket::QueryParser do
       assert @parser.parse('SELECT * FROM "posts" WHERE (title = red AND blog_id = big)')
     end
 
+    it "doesn't support partial selects" do
+      assert_nil @parser.parse('SELECT `posts`.author_id FROM `posts` WHERE id = 1')
+    end
+
+    it "supports star selects" do
+      assert @parser.parse("SELECT `posts`.* FROM `posts` WHERE id = 1")
+    end
+
+    it "supports full selects" do
+      assert @parser.parse("SELECT #{Post.column_names.map { |c| "`posts`.`#{c}`" }.join ", "} FROM `posts` WHERE id = 1")
+    end
+
+    if ActiveRecord::VERSION::STRING >= '5.0.0'
+      it "doesn't support selects of ignored columns" do
+        assert_nil @parser.parse("SELECT #{(Post.column_names + Post.ignored_columns).map { |c| "`posts`.`#{c}`" }.join ", "} FROM `posts` WHERE id = 1")
+      end
+    end
+
     describe "extract options" do
       it "provide the limit" do
         assert_nil      parse(conditions: { id: 2 })[:limit]
