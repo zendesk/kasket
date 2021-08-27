@@ -103,6 +103,30 @@ describe Kasket::ReadMixin do
           assert_equal 2, @record_count
           assert_equal "Comment", @class_name
         end
+
+        describe "when read_multi raises a RuntimeError with 'multi_response has completed'" do
+          before do
+            Kasket.cache.stubs(:read_multi).raises(RuntimeError.new("multi_response has completed"))
+          end
+
+          it "calls the db" do
+            Comment.expects(:find_by_sql_without_kasket).once.returns(@comment_records)
+
+            Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
+          end
+        end
+
+        describe "when read_multi raises a RuntimeError with some other message" do
+          before do
+            Kasket.cache.stubs(:read_multi).raises(RuntimeError.new("good news everyone"))
+          end
+
+          it "re-raises the exception" do
+            assert_raises RuntimeError do
+              Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
+            end
+          end
+        end
       end
 
       describe "a cache miss" do
