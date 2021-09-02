@@ -66,6 +66,8 @@ module Kasket
     def find_by_sql_with_kasket_on_id_array(keys)
       begin
         key_attributes_map = Kasket.cache.read_multi(*keys)
+      rescue Dalli::DalliError, Dalli::MarshalError, Dalli::NetworkError, Dalli::RingError, Dalli::UnmarshalError, Dalli::ValueOverMaxSize
+        key_attributes_map = missing_records_from_db(keys)
       rescue RuntimeError => e
         # Elasticache Memcached has a bug where it returns a 0x00 binary protocol response with no data
         # during a reboot, causing the Dalli memcached client to throw a RuntimeError during a multi get
