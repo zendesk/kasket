@@ -29,7 +29,7 @@ module Kasket
         query[:attributes] = sorted_attribute_value_pairs(where)
         return nil if query[:attributes].nil?
 
-        if query[:attributes].size > 1 && query[:attributes].map(&:last).any? {|a| a.is_a?(Array)}
+        if query[:attributes].size > 1 && query[:attributes].map(&:last).any?(Array)
           # this is a query with IN conditions AND other conditions
           return nil
         end

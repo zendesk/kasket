@@ -12,5 +12,6 @@ gem "mocha",       "~> 1.13"
 gem "rake",        "~> 13"
 gem "timecop",     "~> 0.9"
 gem "rubocop",     "~> 1.5.0"
+gem "rubocop-performance", "~> 1.10.2"
 
 gemspec path: Bundler.root.sub('/gemfiles', '')
