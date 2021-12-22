@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 require 'bundler/setup'
 require 'bundler/gem_tasks'
-require 'wwtd/tasks'
 require 'bump/tasks'
 
 unless RUBY_PLATFORM == "java"
@@ -15,4 +14,4 @@ Rake::TestTask.new(:test) do |test|
   test.verbose = true
 end
 
-task default: 'wwtd:local'
+task default: 'test'
