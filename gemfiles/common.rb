@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 source 'https://rubygems.org'
 
-gem 'activerecord-jdbcmysql-adapter', '~> 1.2', platforms: :jruby
-gem 'mysql2', '~> 0.4.0', platforms: :ruby
+gem 'mysql2', '~> 0.4.0'
 
 # dev dependencies:
-gem "byebug",      "~> 11.1", platforms: :ruby
+gem "byebug",      "~> 11.1"
 gem "bump",        "~> 0.10"
 gem "minitest",    "~> 5.1"
 gem "minitest-rg", "~> 5.2"
