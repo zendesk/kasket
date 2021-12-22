@@ -13,5 +13,6 @@ gem "rake",        "~> 13"
 gem "timecop",     "~> 0.9"
 gem "rubocop",     "~> 1.5.0"
 gem "rubocop-performance", "~> 1.10.2"
+gem "rubocop-rubycw",      "~> 0.1.6"
 
 gemspec path: Bundler.root.sub('/gemfiles', '')

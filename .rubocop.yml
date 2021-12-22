@@ -1,5 +1,6 @@
 require:
   - rubocop-performance
+  - rubocop-rubycw
 
 AllCops:
   DisplayCopNames: true
