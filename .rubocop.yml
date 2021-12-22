@@ -1,6 +1,7 @@
 AllCops:
   DisplayCopNames: true
   TargetRubyVersion: 2.5
+  NewCops: enable
   Exclude:
     - vendor/**/*
     - gemfiles/vendor/**/*
@@ -159,4 +160,19 @@ Naming/VariableNumber:
   Enabled: false
 
 Style/WordArray:
+  Enabled: false
+
+Style/CaseLikeIf:
+  Enabled: false
+Style/ExplicitBlockArgument:
+  Enabled: false
+Style/OptionalBooleanParameter:
+  Enabled: false
+Style/RedundantRegexpEscape:
+  Enabled: false
+Style/StringConcatenation:
+  Enabled: false
+Style/SoleNestedConditional:
+  Enabled: false
+Lint/EmptyClass:
   Enabled: false

@@ -12,6 +12,6 @@ gem "minitest-rg", "~> 5.2"
 gem "mocha",       "~> 1.13"
 gem "rake",        "~> 13"
 gem "timecop",     "~> 0.9"
-gem "rubocop",     "~> 0.89.1", platforms: :ruby
+gem "rubocop",     "~> 1.5.0"
 
 gemspec path: Bundler.root.sub('/gemfiles', '')
