@@ -10,14 +10,17 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
-          - 2.6.8
-          # TODO - 2.7
+          - 2.6
+          - 2.7
         gemfile:
           - gemfiles/rails4.2.gemfile
           - gemfiles/rails5.0.gemfile
           - gemfiles/rails5.1.gemfile
           - gemfiles/rails5.2.gemfile
           - gemfiles/rails6.0.gemfile
+        exclude:
+          - ruby: 2.7
+            gemfile: gemfiles/rails4.2.gemfile
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
@@ -47,7 +50,7 @@ jobs:
       - uses: zendesk/checkout@v2
       - uses: zendesk/setup-ruby@v1
         with:
-          ruby-version: 2.6.8
+          ruby-version: 2.6
           bundler-cache: true
       - name: rubocop
         run: bundle exec rubocop
