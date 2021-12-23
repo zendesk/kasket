@@ -1,18 +1,15 @@
 # frozen_string_literal: true
 require 'bundler/setup'
 require 'bundler/gem_tasks'
-require 'wwtd/tasks'
 require 'bump/tasks'
+require 'rubocop/rake_task'
 
-unless RUBY_PLATFORM == "java"
-  require 'rubocop/rake_task'
-  RuboCop::RakeTask.new
-end
+RuboCop::RakeTask.new
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.pattern = 'test/**/*_test.rb'
-  test.verbose = true
+  test.warning = false
 end
 
-task default: 'wwtd:local'
+task default: 'test'
