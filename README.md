@@ -1,4 +1,4 @@
-# Kasket [![Build status](https://circleci.com/gh/zendesk/kasket.svg?style=svg)](https://circleci.com/gh/zendesk/kasket)
+# Kasket
 
 ### Puts a cap on your queries
 A caching layer for ActiveRecord (3.x and 4.x)
