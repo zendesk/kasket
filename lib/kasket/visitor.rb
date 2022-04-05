@@ -52,11 +52,18 @@ module Kasket
       return :unsupported if ActiveRecord::VERSION::MAJOR < 5 ? node.having : node.havings.present?
       return :unsupported if node.set_quantifier
       return :unsupported if !node.source || node.source.empty?
-      return :unsupported if node.projections.size != 1
+      return :unsupported if node.projections.empty?
 
       select = node.projections[0]
       select = select.name if select.respond_to?(:name)
-      return :unsupported if select != '*'
+      if select != '*'
+        # If we're not selecting all columns using star, then ensure all columns are selected explicitly
+        column_names = @model_class.column_names
+        return :unsupported unless node.projections.size == column_names.size
+
+        projection_names = node.projections.map { |p| p.name if p.respond_to?(:name) }.compact
+        return unless (column_names - projection_names).empty?
+      end
 
       parts = [visit(node.source)]
 

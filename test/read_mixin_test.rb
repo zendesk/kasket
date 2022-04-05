@@ -9,7 +9,7 @@ describe Kasket::ReadMixin do
       if ActiveRecord::VERSION::STRING >= '4.2.0'
         @post_database_result = {
           'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil,
-          "poly_type" => nil, "created_at" => nil, "updated_at" => nil, "big_id" => nil
+          "poly_type" => nil, "created_at" => nil, "updated_at" => nil, "big_id" => nil, "ignored_column" => nil
         }
         @comment_database_result = [
           { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil },
@@ -61,6 +61,7 @@ describe Kasket::ReadMixin do
 
       describe "a single record" do
         before do
+          Post.unstub(:find_by_sql_without_kasket)
           Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
         end
 
@@ -82,10 +83,12 @@ describe Kasket::ReadMixin do
       end
 
       describe "an array of records" do
-        let(:posts) { ["#{Post.kasket_key_prefix}id=1", "#{Post.kasket_key_prefix}id=2"] }
+        let(:comments) { ["#{Comment.kasket_key_prefix}id=1", "#{Comment.kasket_key_prefix}id=2"] }
 
         before do
-          Kasket.cache.write("#{Comment.kasket_key_prefix}post_id=1", posts)
+          Comment.unstub(:find_by_sql_without_kasket)
+          Kasket.cache.write("#{Comment.kasket_key_prefix}post_id=1", comments)
+          @comment_database_result.each { |c| Kasket.cache.write("#{Comment.kasket_key_prefix}id=#{c['id']}", c) }
         end
 
         it "does not call the db" do
@@ -113,8 +116,6 @@ describe Kasket::ReadMixin do
         end
 
         it "does not send a notification" do
-          Post.stubs(:find_by_sql_without_kasket).returns(@post_records)
-
           ActiveSupport::Notifications.subscribed(callback, 'instantiation.active_record') do
             Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
           end
@@ -166,6 +167,7 @@ describe Kasket::ReadMixin do
       assert_equal(["#{Comment.kasket_key_prefix}id=1", "#{Comment.kasket_key_prefix}id=2"], stored_value)
       assert_equal(@comment_database_result, stored_value.map {|key| Kasket.cache.read(key)})
 
+      Comment.unstub(:find_by_sql_without_kasket)
       Comment.expects(:find_by_sql_without_kasket).never
       records = Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
       assert_equal(@comment_records, records.sort_by(&:id))

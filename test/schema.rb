@@ -18,6 +18,7 @@ ActiveRecord::Schema.define do
       t.string   'title'
       t.integer  'author_id'
       t.integer  'blog_id'
+      t.string   'ignored_column'
       t.integer  'poly_id'
       t.integer  'big_id', limit: 8
       t.string   'poly_type'
