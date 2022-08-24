@@ -40,7 +40,12 @@ module Kasket
       def kasket_keys(options = {})
         attribute_sets = [attributes]
 
-        previous_changes = options[:previous_changes] || previous_changes()
+        previous_changes = options[:previous_changes]
+        previous_changes ||= if respond_to?(:saved_changes)
+          saved_changes.transform_values(&:first)
+        else
+          previous_changes() # keep parens or rename the local var
+        end
         if previous_changes.present?
           old_attributes = previous_changes.each_with_object({}) do |(attribute, (old, _)), all|
             all[attribute.to_s] = old
