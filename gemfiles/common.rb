@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 source 'https://rubygems.org'
 
-gem 'mysql2', '~> 0.4.0'
+gem 'mysql2', '~> 0.5'
 
 # dev dependencies:
 gem "byebug",      "~> 11.1"
