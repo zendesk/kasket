@@ -47,9 +47,7 @@ class Post < ActiveRecord::Base
   has_kasket_on :title
   has_kasket_on :blog_id, :id
 
-  if ActiveRecord::VERSION::STRING >= '5.0.0'
-    self.ignored_columns = ["ignored_column"]
-  end
+  self.ignored_columns = ["ignored_column"]
 
   def make_dirty!
     self.updated_at = Time.now

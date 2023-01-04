@@ -6,22 +6,14 @@ describe Kasket::ReadMixin do
 
   describe "find by sql with kasket" do
     before do
-      if ActiveRecord::VERSION::STRING >= '4.2.0'
-        @post_database_result = {
-          'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil,
-          "poly_type" => nil, "created_at" => nil, "updated_at" => nil, "big_id" => nil, "ignored_column" => nil
-        }
-        @comment_database_result = [
-          { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil },
-          { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil }
-        ]
-      else
-        @post_database_result = { 'id' => 1, 'title' => 'Hello' }
-        @comment_database_result = [
-          { 'id' => 1, 'body' => 'Hello' },
-          { 'id' => 2, 'body' => 'World' }
-        ]
-      end
+      @post_database_result = {
+        'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil,
+        "poly_type" => nil, "created_at" => nil, "updated_at" => nil, "big_id" => nil, "ignored_column" => nil
+      }
+      @comment_database_result = [
+        { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil },
+        { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil }
+      ]
 
       @post_records = [Post.send(:instantiate, @post_database_result)]
       Post.stubs(:find_by_sql_without_kasket).returns(@post_records)
