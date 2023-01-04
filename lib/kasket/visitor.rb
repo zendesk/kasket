@@ -65,6 +65,14 @@ module Kasket
         return unless (column_names - projection_names).empty?
       end
 
+      # un-optimize AR 6.1 by adding a redundant And node to hit visitor below
+      if ActiveRecord::VERSION::STRING.start_with? "6.1"
+        if node.wheres.size == 1
+          n = node.wheres[0]
+          node.wheres[0] = Arel::Nodes::And.new([n]) unless n.is_a?(Arel::Nodes::And)
+        end
+      end
+
       parts = [visit(node.source)]
 
       parts += node.wheres.map {|where| visit(where) }
@@ -105,6 +113,8 @@ module Kasket
 
       [left, visit(node.right)]
     end
+
+    alias_method :visit_Arel_Nodes_HomogeneousIn, :visit_Arel_Nodes_In
 
     def visit_Arel_Nodes_Equality(node, *_)
       right =
@@ -155,6 +165,15 @@ module Kasket
         when nil    then nil
         when String then node.val
         else quoted(node.val)
+        end
+      end
+    else # R52: val -> value
+      def visit_Arel_Nodes_Casted(node, *_)
+        v = node.value
+        case v
+        when nil    then nil
+        when String then v
+        else quoted(v)
         end
       end
     end

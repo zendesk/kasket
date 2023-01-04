@@ -105,7 +105,11 @@ module Kasket
           case ActiveRecord::VERSION::MAJOR
           when 3 then column.type_cast(value)
           when 4 then column.type_cast_for_database(value)
-          else conn.type_cast_from_column(column, value)
+          when 5, 6
+            type = conn.lookup_cast_type_from_column(column)
+            conn.type_cast(type.serialize(value))
+          else
+            raise NotImplementedError, "Unsupported: #{ActiveRecord::VERSION}"
           end
         conn.quote(casted_value).downcase
       else

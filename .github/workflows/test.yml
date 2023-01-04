@@ -1,8 +1,12 @@
 ---
 name: Continuous Integration
 "on":
-  - push
-  - pull_request
+  pull_request:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - "**"
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -18,6 +22,7 @@ jobs:
           - gemfiles/rails5.1.gemfile
           - gemfiles/rails5.2.gemfile
           - gemfiles/rails6.0.gemfile
+          - gemfiles/rails6.1.gemfile
         exclude:
           - ruby: 2.7
             gemfile: gemfiles/rails4.2.gemfile
@@ -49,10 +54,10 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: zendesk/checkout@v2
+      - uses: zendesk/checkout@v3
       - uses: zendesk/setup-ruby@v1
         with:
-          ruby-version: 2.6
+          ruby-version: 2.7
           bundler-cache: true
       - name: rubocop
         run: bundle exec rubocop

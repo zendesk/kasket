@@ -180,7 +180,18 @@ describe Kasket::ReadMixin do
         @record = Post.find_by_sql(@sql).first
         assert_equal "asd", @record.title # read from cache ?
         attributes = @record.instance_variable_get(:@attributes)
-        attributes = attributes.send(:attributes).instance_variable_get(:@values) unless attributes.is_a?(Hash)
+
+        case attributes.class.name # LazyAttributeSet is 6.1+
+        when "Hash"
+          # do nothing
+        when "ActiveModel::LazyAttributeSet"
+          attributes = attributes.send(:values)
+        when "ActiveModel::AttributeSet", "ActiveRecord::AttributeSet"
+          attributes = attributes.send(:attributes).instance_variable_get(:@values)
+        else
+          raise "unknown type: %p" % [attributes]
+        end
+
         attributes['id'] = 3
       end
 
