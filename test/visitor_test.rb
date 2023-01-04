@@ -52,7 +52,7 @@ describe Kasket::Visitor do
       attributes: [[:public, 1]],
       from: "comments",
       index: [:public],
-      key: "#{DefaultComment.kasket_key_prefix}public=1"
+      key: "#{DefaultComment.kasket_key_prefix}public=#{ActiveRecord::VERSION::STRING.start_with?('5.2') ? "'t'" : "1"}"
     }
     assert_equal expected, DefaultComment.unscoped.where(public: true).to_kasket_query
 
@@ -60,7 +60,7 @@ describe Kasket::Visitor do
       attributes: [[:public, 0]],
       from: "comments",
       index: [:public],
-      key: "#{DefaultComment.kasket_key_prefix}public=0"
+      key: "#{DefaultComment.kasket_key_prefix}public=#{ActiveRecord::VERSION::STRING.start_with?('5.2') ? "'f'" : "0"}"
     }
     assert_equal expected, DefaultComment.unscoped.where(public: false).to_kasket_query
   end

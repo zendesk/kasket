@@ -2,3 +2,4 @@
 eval_gemfile('./common.rb')
 
 gem 'activerecord', '~> 6.1.0'
+gem 'sqlite3', '~> 1.4'
