@@ -101,16 +101,8 @@ module Kasket
     def kasket_quoted_value_for_column(value, column)
       if column
         conn = connection
-        casted_value =
-          case ActiveRecord::VERSION::MAJOR
-          when 3 then column.type_cast(value)
-          when 4 then column.type_cast_for_database(value)
-          when 5, 6
-            type = conn.lookup_cast_type_from_column(column)
-            conn.type_cast(type.serialize(value))
-          else
-            raise NotImplementedError, "Unsupported: #{ActiveRecord::VERSION}"
-          end
+        type = conn.lookup_cast_type_from_column(column)
+        casted_value = conn.type_cast(type.serialize(value))
         conn.quote(casted_value).downcase
       else
         value.to_s

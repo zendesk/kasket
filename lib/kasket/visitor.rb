@@ -49,7 +49,7 @@ module Kasket
 
     def visit_Arel_Nodes_SelectCore(node, *_)
       return :unsupported if node.groups.any?
-      return :unsupported if ActiveRecord::VERSION::MAJOR < 5 ? node.having : node.havings.present?
+      return :unsupported if node.havings.present?
       return :unsupported if node.set_quantifier
       return :unsupported if !node.source || node.source.empty?
       return :unsupported if node.projections.empty?
@@ -81,11 +81,7 @@ module Kasket
     end
 
     def visit_Arel_Nodes_Limit(node, *_)
-      if ActiveRecord::VERSION::MAJOR < 5
-        { limit: node.value.to_i }
-      else
-        { limit: visit(node.value).to_i }
-      end
+      { limit: visit(node.value).to_i }
     end
 
     def visit_Arel_Nodes_JoinSource(node, *_)
@@ -144,14 +140,10 @@ module Kasket
     end
 
     def visit_Arel_Nodes_BindParam(node, *_)
-      if ActiveRecord::VERSION::MAJOR < 5
-        visit(@binds.shift[1])
+      if ActiveRecord::VERSION::STRING < '5.2'
+        visit(@binds.shift)
       else
-        if ActiveRecord::VERSION::STRING < '5.2'
-          visit(@binds.shift)
-        else
-          visit(node.value.value) unless node.value.value.nil?
-        end
+        visit(node.value.value) unless node.value.value.nil?
       end
     end
 

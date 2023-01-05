@@ -41,11 +41,7 @@ module Kasket
         attribute_sets = [attributes]
 
         previous_changes = options[:previous_changes]
-        previous_changes ||= if respond_to?(:saved_changes)
-          saved_changes.transform_values(&:first)
-        else
-          previous_changes() # keep parens or rename the local var
-        end
+        previous_changes ||= saved_changes.transform_values(&:first)
         if previous_changes.present?
           old_attributes = previous_changes.each_with_object({}) do |(attribute, (old, _)), all|
             all[attribute.to_s] = old
@@ -93,23 +89,14 @@ module Kasket
         super
       end
 
-      if ActiveRecord::VERSION::MAJOR == 3
-        def update_column(column, value)
-          previous_changes = { column => [attributes[column.to_s], value] }
-          result = super
-          clear_kasket_indices(previous_changes: previous_changes)
-          result
+      def update_columns(new_attributes)
+        previous_attributes = attributes
+        previous_changes = new_attributes.each_with_object({}) do |(k, v), all|
+          all[k] = [previous_attributes[k.to_s], v]
         end
-      else
-        def update_columns(new_attributes)
-          previous_attributes = attributes
-          previous_changes = new_attributes.each_with_object({}) do |(k, v), all|
-            all[k] = [previous_attributes[k.to_s], v]
-          end
-          result = super
-          clear_kasket_indices(previous_changes: previous_changes)
-          result
-        end
+        result = super
+        clear_kasket_indices(previous_changes: previous_changes)
+        result
       end
 
       def kasket_after_commit_dummy
@@ -147,10 +134,6 @@ module Kasket
       model_class.after_save :kasket_after_save
       model_class.after_destroy :kasket_after_destroy
       model_class.after_commit :kasket_after_commit_dummy
-
-      if ActiveRecord::VERSION::MAJOR == 3 || (ActiveRecord::VERSION::MAJOR == 4 && ActiveRecord::VERSION::MINOR == 0)
-        model_class.after_touch :kasket_after_commit
-      end
 
       class << model_class
         alias_method :transaction_without_kasket_disabled, :transaction

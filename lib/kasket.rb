@@ -31,11 +31,8 @@ module Kasket
     CONFIGURATION[:default_expires_in]  = options[:default_expires_in]  if options[:default_expires_in]
 
     ActiveRecord::Base.extend(Kasket::ConfigurationMixin)
-
-    if defined?(ActiveRecord::Relation)
-      ActiveRecord::Relation.include Kasket::RelationMixin
-      Arel::SelectManager.include Kasket::SelectManagerMixin
-    end
+    ActiveRecord::Relation.include(Kasket::RelationMixin)
+    Arel::SelectManager.include(Kasket::SelectManagerMixin)
   end
 
   def self.cache_store=(options)

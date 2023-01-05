@@ -17,21 +17,14 @@ jobs:
           - 2.6
           - 2.7
         gemfile:
-          - gemfiles/rails4.2.gemfile
-          - gemfiles/rails5.0.gemfile
           - gemfiles/rails5.1.gemfile
           - gemfiles/rails5.2.gemfile
           - gemfiles/rails6.0.gemfile
           - gemfiles/rails6.1.gemfile
-        exclude:
-          - ruby: 2.7
-            gemfile: gemfiles/rails4.2.gemfile
-          - ruby: 2.7
-            gemfile: gemfiles/rails5.0.gemfile
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
-      - uses: zendesk/checkout@v2
+      - uses: zendesk/checkout@v3
       - uses: zendesk/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}

@@ -83,10 +83,8 @@ describe Kasket::QueryParser do
       assert @parser.parse("SELECT #{Post.column_names.map { |c| "`posts`.`#{c}`" }.join ", "} FROM `posts` WHERE id = 1")
     end
 
-    if ActiveRecord::VERSION::STRING >= '5.0.0'
-      it "doesn't support selects of ignored columns" do
-        assert_nil @parser.parse("SELECT #{(Post.column_names + Post.ignored_columns).map { |c| "`posts`.`#{c}`" }.join ", "} FROM `posts` WHERE id = 1")
-      end
+    it "doesn't support selects of ignored columns" do
+      assert_nil @parser.parse("SELECT #{(Post.column_names + Post.ignored_columns).map { |c| "`posts`.`#{c}`" }.join ", "} FROM `posts` WHERE id = 1")
     end
 
     describe "extract options" do

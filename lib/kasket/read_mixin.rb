@@ -14,14 +14,10 @@ module Kasket
 
       if use_kasket?
         query = if sql.respond_to?(:to_kasket_query)
-          if ActiveRecord::VERSION::MAJOR < 5
-            sql.to_kasket_query(self, args[1])
+          if ActiveRecord::VERSION::STRING < '5.2'
+            sql.to_kasket_query(self, args[1].map(&:value_for_database))
           else
-            if ActiveRecord::VERSION::STRING < '5.2'
-              sql.to_kasket_query(self, args[1].map(&:value_for_database))
-            else
-              sql.to_kasket_query(self)
-            end
+            sql.to_kasket_query(self)
           end
         else
           kasket_parser.parse(sanitize_sql(sql))

@@ -58,14 +58,12 @@ describe "find one" do
     assert_key post.kasket_key
   end
 
-  if ActiveRecord::VERSION::STRING >= '5.0.0'
-    it "doesn't use cache when using the :select option with all columns including ignored columns" do
-      post = Post.first
-      refute_key post.kasket_key
+  it "doesn't use cache when using the :select option with all columns including ignored columns" do
+    post = Post.first
+    refute_key post.kasket_key
 
-      Post.select(Post.column_names + Post.ignored_columns).find(post.id)
-      refute_key post.kasket_key
-    end
+    Post.select(Post.column_names + Post.ignored_columns).find(post.id)
+    refute_key post.kasket_key
   end
 
   it "respect scope" do

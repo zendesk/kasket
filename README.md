@@ -1,7 +1,7 @@
 # Kasket
 
 ### Puts a cap on your queries
-A caching layer for ActiveRecord (3.x and 4.x)
+A caching layer for ActiveRecord.
 
 Developed and used by [Zendesk](http://zendesk.com).
 

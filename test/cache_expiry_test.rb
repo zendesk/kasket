@@ -65,17 +65,15 @@ describe "cache expiry" do
       @post.update_column :title, "new_title"
     end
 
-    if ActiveRecord::VERSION::MAJOR >= 4
-      it "clears all indices for instance when using update_columns" do
-        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "id=#{@post.id}")
-        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'")
-        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'/first")
-        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'")
-        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'/first")
-        Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "blog_id=#{@post.blog_id}/id=#{@post.id}")
+    it "clears all indices for instance when using update_columns" do
+      Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "id=#{@post.id}")
+      Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'")
+      Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='#{@post.title}'/first")
+      Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'")
+      Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "title='new_title'/first")
+      Kasket.cache.expects(:delete).with(Post.kasket_key_prefix + "blog_id=#{@post.blog_id}/id=#{@post.id}")
 
-        @post.update_columns title: "new_title"
-      end
+      @post.update_columns title: "new_title"
     end
 
     describe "when :write_through is true" do
