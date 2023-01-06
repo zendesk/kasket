@@ -1,25 +1,9 @@
 # frozen_string_literal: true
-erb_config = IO.read(File.expand_path("database.yml", File.dirname(__FILE__)))
-yaml_config = ERB.new(erb_config).result
-
-ActiveRecord::Base.configurations =
-  YAML.load(yaml_config) # rubocop:disable Security/YAMLLoad
-
-configs = ActiveRecord::Base.configurations
-config = if configs.respond_to? :find_db_config # TODO: clean up after 5.2 dropped
-  c = configs.find_db_config("test")
-  if c.respond_to? :configuration_hash # 6.1 deprecation
-    c.configuration_hash
-  else
-    c.config.with_indifferent_access
-  end
-else
-  configs["test"].with_indifferent_access
-end
-
-ActiveRecord::Base.establish_connection(config.merge(database: nil))
-ActiveRecord::Base.connection.recreate_database(config[:database], config)
-ActiveRecord::Base.establish_connection(config)
+ActiveRecord::Base.establish_connection(
+  adapter: "sqlite3",
+  database: ":memory:",
+  prepared_statements: false
+)
 
 load(File.dirname(__FILE__) + "/schema.rb")
 
