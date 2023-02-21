@@ -14,6 +14,7 @@ module Kasket
   autoload :Visitor,                'kasket/visitor'
   autoload :SelectManagerMixin,     'kasket/select_manager_mixin'
   autoload :RelationMixin,          'kasket/relation_mixin'
+  autoload :Events,                 'kasket/events'
 
   CONFIGURATION = { # rubocop:disable Style/MutableConstant
     max_collection_size: 100,
