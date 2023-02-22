@@ -26,7 +26,7 @@ module Kasket
 
       if query && has_kasket_index_on?(query[:index])
         if query[:key].is_a?(Array)
-          find_by_sql_with_kasket_on_id_array(query[:key])
+          filter_pending_records(find_by_sql_with_kasket_on_id_array(query[:key]))
         else
           if value = Kasket.cache.read(query[:key])
             # Identified a specific edge case where memcached server returns 0x00 binary protocol response with no data
