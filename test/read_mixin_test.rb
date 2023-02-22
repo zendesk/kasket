@@ -11,8 +11,8 @@ describe Kasket::ReadMixin do
         "poly_type" => nil, "created_at" => nil, "updated_at" => nil, "big_id" => nil, "ignored_column" => nil
       }
       @comment_database_result = [
-        { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil },
-        { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil }
+        { 'id' => 1, 'body' => 'Hello', "post_id" => 1, "created_at" => nil, "updated_at" => nil, "public" => nil },
+        { 'id' => 2, 'body' => 'World', "post_id" => 1, "created_at" => nil, "updated_at" => nil, "public" => nil }
       ]
 
       @post_records = [Post.send(:instantiate, @post_database_result)]
@@ -30,6 +30,47 @@ describe Kasket::ReadMixin do
     it "read results" do
       Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
       assert_equal @post_records, Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+    end
+
+    describe "it can retrieve one or multiple records through the high-level AR model API (Kasket query[:key] is an Array)" do
+      before do
+        # Actually go to the DB.
+        Comment.unstub(:find_by_sql_without_kasket)
+
+        Kasket.cache.write("#{Comment.kasket_key_prefix}id=1", @comment_database_result[0])
+        Kasket.cache.write("#{Comment.kasket_key_prefix}id=2", @comment_database_result[1])
+
+        Kasket.cache.write("#{Comment.kasket_key_prefix}post_id=1", [
+          "#{Comment.kasket_key_prefix}id=1",
+          "#{Comment.kasket_key_prefix}id=2"
+        ])
+      end
+
+      specify "one record" do
+        Comment.expects(:find_by_sql_without_kasket).never
+
+        out = Comment.find(1)
+        assert_equal @comment_records[0], out
+
+        out = Comment.find_by(id: 1)
+        assert_equal @comment_records[0], out
+
+        out = Comment.where(id: 2).first
+        assert_equal @comment_records[1], out
+      end
+
+      specify "multiple records" do
+        Comment.expects(:find_by_sql_without_kasket).never
+
+        out = Comment.find(1, 2)
+        assert_equal @comment_records, out
+
+        out = Comment.where(id: [1, 2]).to_a
+        assert_equal @comment_records, out
+
+        out = Comment.where(post_id: 1).to_a
+        assert_equal @comment_records, out
+      end
     end
 
     describe "instrumentation" do
