@@ -36,9 +36,6 @@ describe Kasket::ReadMixin do
 
     describe "it can retrieve one or multiple records through the high-level AR model API (Kasket query[:key] is an Array)" do
       before do
-        # Actually go to the DB.
-        Comment.unstub(:find_by_sql_without_kasket)
-
         Kasket.cache.write("#{Comment.kasket_key_prefix}id=1", @comment_database_result[0])
         Kasket.cache.write("#{Comment.kasket_key_prefix}id=2", @comment_database_result[1])
 
