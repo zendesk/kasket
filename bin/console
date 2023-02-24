@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+# A dev-test console.
+#
+# Usage:
+#    bin/console
+
+require "bundler/setup"
+require "kasket"
+
+# Use the test setup to access the test DB and its data.
+require_relative "../test/helper"
+
+# Seed some records from the fixtures.
+ActiveRecord::FixtureSet.create_fixtures(
+  File.expand_path("../test/fixtures", __dir__),
+  %w[authors blogs posts comments]
+)
+
+# Clean state.
+Kasket.cache.clear
+
+require "pry"
+Pry.start

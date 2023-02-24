@@ -27,14 +27,6 @@ class ActiveSupport::TestCase
   self.fixture_path = File.dirname(__FILE__) + "/fixtures/"
   fixtures :all
 
-  def create_fixtures(*table_names)
-    if block_given?
-      Fixtures.create_fixtures(Test::Unit::TestCase.fixture_path, table_names) { yield }
-    else
-      Fixtures.create_fixtures(Test::Unit::TestCase.fixture_path, table_names)
-    end
-  end
-
   self.use_transactional_tests = true
   self.use_instantiated_fixtures = false
 

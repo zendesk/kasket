@@ -4,20 +4,22 @@ require_relative "helper"
 describe Kasket::ReadMixin do
   fixtures :authors
 
+  before do
+    @post_database_result = {
+      'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil,
+      "poly_type" => nil, "created_at" => nil, "updated_at" => nil, "big_id" => nil, "ignored_column" => nil
+    }
+    @comment_database_result = [
+      { 'id' => 1, 'body' => 'Hello', "post_id" => 1, "created_at" => nil, "updated_at" => nil, "public" => nil },
+      { 'id' => 2, 'body' => 'World', "post_id" => 1, "created_at" => nil, "updated_at" => nil, "public" => nil }
+    ]
+    @post_records = [Post.send(:instantiate, @post_database_result)]
+    @comment_records = @comment_database_result.map {|r| Comment.send(:instantiate, r)}
+  end
+
   describe "find by sql with kasket" do
     before do
-      @post_database_result = {
-        'id' => 1, 'title' => 'Hello', "author_id" => nil, "blog_id" => nil, "poly_id" => nil,
-        "poly_type" => nil, "created_at" => nil, "updated_at" => nil, "big_id" => nil, "ignored_column" => nil
-      }
-      @comment_database_result = [
-        { 'id' => 1, 'body' => 'Hello', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil },
-        { 'id' => 2, 'body' => 'World', "post_id" => nil, "created_at" => nil, "updated_at" => nil, "public" => nil }
-      ]
-
-      @post_records = [Post.send(:instantiate, @post_database_result)]
       Post.stubs(:find_by_sql_without_kasket).returns(@post_records)
-      @comment_records = @comment_database_result.map {|r| Comment.send(:instantiate, r)}
       Comment.stubs(:find_by_sql_without_kasket).returns(@comment_records)
     end
 
@@ -30,6 +32,44 @@ describe Kasket::ReadMixin do
     it "read results" do
       Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
       assert_equal @post_records, Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+    end
+
+    describe "it can retrieve one or multiple records through the high-level AR model API (Kasket query[:key] is an Array)" do
+      before do
+        Kasket.cache.write("#{Comment.kasket_key_prefix}id=1", @comment_database_result[0])
+        Kasket.cache.write("#{Comment.kasket_key_prefix}id=2", @comment_database_result[1])
+
+        Kasket.cache.write("#{Comment.kasket_key_prefix}post_id=1", [
+          "#{Comment.kasket_key_prefix}id=1",
+          "#{Comment.kasket_key_prefix}id=2"
+        ])
+      end
+
+      specify "one record" do
+        Comment.expects(:find_by_sql_without_kasket).never
+
+        out = Comment.find(1)
+        assert_equal @comment_records[0], out
+
+        out = Comment.find_by(id: 1)
+        assert_equal @comment_records[0], out
+
+        out = Comment.where(id: 2).first
+        assert_equal @comment_records[1], out
+      end
+
+      specify "multiple records" do
+        Comment.expects(:find_by_sql_without_kasket).never
+
+        out = Comment.find(1, 2)
+        assert_equal @comment_records, out
+
+        out = Comment.where(id: [1, 2]).to_a
+        assert_equal @comment_records, out
+
+        out = Comment.where(post_id: 1).to_a
+        assert_equal @comment_records, out
+      end
     end
 
     describe "instrumentation" do
@@ -261,6 +301,47 @@ describe Kasket::ReadMixin do
         assert_equal [], Post.where(id: @post.id)
         assert_nil Post.all.detect { |x| x.id == @post.id }
         assert_equal [], Post.find_by_sql("SELECT * FROM `posts` WHERE id = 1")
+      end
+    end
+
+    describe "when finding multiple records (Kasket query[:key] is an Array)" do
+      before do
+        Kasket.cache.write("#{Comment.kasket_key_prefix}id=1", @comment_database_result[0])
+        Kasket.cache.write("#{Comment.kasket_key_prefix}id=2", @comment_database_result[1])
+
+        Kasket.cache.write("#{Comment.kasket_key_prefix}post_id=1", [
+          "#{Comment.kasket_key_prefix}id=1",
+          "#{Comment.kasket_key_prefix}id=2"
+        ])
+
+        @comment = @comment_records[0]
+      end
+
+      it "returns the saved version" do
+        ActiveRecord::Base.transaction do
+          @comment.body = "new body"
+          @comment.save!
+
+          assert_equal "new body", Comment.find(1, 2)[0].body
+          assert_equal "new body", Comment.where(id: [1, 2]).to_a[0].body
+          assert_equal "new body", Comment.where(post_id: 1).to_a[0].body
+        end
+      end
+
+      it "returns nothing if object destroyed" do
+        ActiveRecord::Base.transaction do
+          @comment.destroy
+
+          assert_raises ActiveRecord::RecordNotFound do
+            Comment.find(1, 2)
+          end
+
+          assert_equal 1, Comment.where(id: [1, 2]).to_a.length
+          refute_equal @comment.id, Comment.where(id: [1, 2]).to_a[0]
+
+          assert_equal 1, Comment.where(post_id: 1).to_a.length
+          refute_equal @comment.id, Comment.where(post_id: 1).to_a[0]
+        end
       end
     end
   end

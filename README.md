@@ -137,6 +137,20 @@ Absolutely, but Cache Money does so much more.
 * The Cache Money code is overly complex.
 * Cache Money seems abandoned.
 
+## Development
+
+Run the tests with:
+
+```
+$ rake test
+```
+
+Access a dev console running on the local test DB:
+
+```
+$ bin/console
+```
+
 ## Note on Patches/Pull Requests
 
 * Fork the project.
