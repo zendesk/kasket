@@ -36,8 +36,15 @@ module Kasket
             result_set = if value.is_a?(TrueClass)
               find_by_sql_without_kasket(sql, binds, *restargs, **kwargs, &blk)
             elsif value.is_a?(Array)
+              # The data from the Kasket cache is a list of keys to other Kasket entries.
+              # This usually happens when we're trying to load a collection association,
+              # e.g. a list of comments using their post_id in the query.
+              # Do not report a cache hit yet, and defer it until we've verified that at
+              # least one of the retrieved keys is actually in the cache.
               filter_pending_records(find_by_sql_with_kasket_on_id_array(value))
             else
+              # Direct cache hit for the key.
+              Events.report("cache_hit", self)
               filter_pending_records(Array.wrap(value).collect { |record| instantiate(record.dup, &blk) })
             end
 
@@ -60,6 +67,9 @@ module Kasket
       key_attributes_map = Kasket.cache.read_multi(*keys)
 
       found_keys, missing_keys = keys.partition {|k| key_attributes_map[k] }
+      # Only report a cache hit if at least some keys were found in the cache.
+      Events.report("cache_hit", self) if found_keys.any?
+
       found_keys.each {|k| key_attributes_map[k] = instantiate(key_attributes_map[k].dup, &blk) }
       key_attributes_map.merge!(missing_records_from_db(missing_keys))
 
