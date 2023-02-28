@@ -10,7 +10,7 @@ describe Kasket::Events do
 
   after { Kasket::CONFIGURATION[:events_callback] = @previous }
 
-  describe "::report" do
+  describe ".report" do
     describe "when there is no stats callback configured" do
       before do
         Kasket::CONFIGURATION[:events_callback] = nil
