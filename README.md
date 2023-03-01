@@ -50,13 +50,16 @@ Kasket.setup(write_through: true)
 
 #### Events Callback
 
-You can configure a callable object to listen to events, e.g. `cache_hit`. This can be useful to emit metrics and observe Kasket's behaviour.
+You can configure a callable object to listen to events. This can be useful to emit metrics and observe Kasket's behaviour.
 
 ```ruby
 Kasket.setup(events_callback: -> (event, ar_klass) do
   MyMetrics.increase_some_counter("kasket.#{event}", tags: ["table:#{ar_klass.table_name}"])
 end)
 ```
+
+The following events are emitted:
+* `"cache_hit"`, when Kasket has found some record's data in the cache, which can be returned.
 
 ## Configuring caching of your models
 
