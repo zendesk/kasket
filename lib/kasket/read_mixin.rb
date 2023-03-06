@@ -8,14 +8,11 @@ module Kasket
       end
     end
 
-    # *args can be replaced with (sql, *args) once we stop supporting Rails < 5.2
-    def find_by_sql_with_kasket(*args)
-      sql = args[0]
-
+    def find_by_sql_with_kasket(sql, binds = [], *restargs, **kwargs, &blk)
       if use_kasket?
         query = if sql.respond_to?(:to_kasket_query)
           if ActiveRecord::VERSION::STRING < '5.2'
-            sql.to_kasket_query(self, args[1].map(&:value_for_database))
+            sql.to_kasket_query(self, binds.map(&:value_for_database))
           else
             sql.to_kasket_query(self)
           end
@@ -37,7 +34,7 @@ module Kasket
             # The code in this first condition of TrueClass === true  will
             # skip the kasket cache for these specific objects and go directly to SQL for retrieval.
             result_set = if value.is_a?(TrueClass)
-              find_by_sql_without_kasket(*args)
+              find_by_sql_without_kasket(sql, binds, *restargs, **kwargs, &blk)
             elsif value.is_a?(Array)
               filter_pending_records(find_by_sql_with_kasket_on_id_array(value))
             else
@@ -51,11 +48,11 @@ module Kasket
 
             ActiveSupport::Notifications.instrument('instantiation.active_record', payload) { result_set }
           else
-            store_in_kasket(query[:key], find_by_sql_without_kasket(*args))
+            store_in_kasket(query[:key], find_by_sql_without_kasket(sql, binds, *restargs, **kwargs, &blk))
           end
         end
       else
-        find_by_sql_without_kasket(*args)
+        find_by_sql_without_kasket(sql, binds, *restargs, **kwargs, &blk)
       end
     end
 
