@@ -8,14 +8,14 @@ module Kasket
         end
       end
 
-      def update_counters_with_kasket_clearing(*args)
+      def update_counters_with_kasket_clearing(*args, **kwargs)
         remove_from_kasket(args[0])
-        update_counters_without_kasket_clearing(*args)
+        update_counters_without_kasket_clearing(*args, **kwargs)
       end
 
-      def transaction_with_kasket_disabled(*args)
+      def transaction_with_kasket_disabled(*args, **kwargs)
         without_kasket do
-          transaction_without_kasket_disabled(*args) { yield }
+          transaction_without_kasket_disabled(*args, **kwargs) { yield }
         end
       end
     end
@@ -111,13 +111,13 @@ module Kasket
         Kasket.add_pending_record(self, _destroyed = true)
       end
 
-      def committed!(*)
+      def committed!(*args, **kwargs)
         Kasket.clear_pending_records
         kasket_after_commit if persisted? || destroyed?
         super
       end
 
-      def rolledback!(*)
+      def rolledback!(*args, **kwargs)
         Kasket.clear_pending_records
         super
       end
