@@ -12,6 +12,7 @@ class Comment < ActiveRecord::Base
   has_one :author, through: :post
 
   has_kasket_on :post_id
+  has_kasket_on :post_id, :id
 end
 
 class Author < ActiveRecord::Base

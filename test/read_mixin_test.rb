@@ -13,8 +13,8 @@ describe Kasket::ReadMixin do
       { 'id' => 1, 'body' => 'Hello', "post_id" => 1, "created_at" => nil, "updated_at" => nil, "public" => nil },
       { 'id' => 2, 'body' => 'World', "post_id" => 1, "created_at" => nil, "updated_at" => nil, "public" => nil }
     ]
-    @post_records = [Post.send(:instantiate, @post_database_result)]
-    @comment_records = @comment_database_result.map {|r| Comment.send(:instantiate, r)}
+    @post_records = [Post.instantiate(@post_database_result)]
+    @comment_records = @comment_database_result.map { |r| Comment.instantiate(r) }
   end
 
   describe "find by sql with kasket" do
@@ -343,6 +343,26 @@ describe Kasket::ReadMixin do
           refute_equal @comment.id, Comment.where(post_id: 1).to_a[0]
         end
       end
+    end
+  end
+
+  describe 'instantiate is passed blocks' do
+    let(:post) { posts(:has_many_comments) }
+    let(:comment_id) { post.comments.last.id }
+
+    before do
+      # populate cache
+      post.comments.find(comment_id)
+      # clear association cache
+      post.reload
+
+      Post.without_kasket do
+        assert_equal post.object_id, post.comments.find(comment_id).post.object_id
+      end
+    end
+
+    it 'instantiates inverse associations' do
+      assert_equal post.object_id, post.comments.find(comment_id).post.object_id
     end
   end
 end
