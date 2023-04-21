@@ -4,7 +4,7 @@ require_relative "helper"
 describe "cacheable" do
   describe "#store_in_kasket" do
     it "only cache object that are kasket_cacheable?" do
-      post = Post.send(:instantiate, 'id' => 1, 'title' => 'Hello')
+      post = Post.instantiate('id' => 1, 'title' => 'Hello')
 
       post.expects(:kasket_cacheable?).returns(true)
       Kasket.cache.expects(:write).once
@@ -19,11 +19,11 @@ describe "cacheable" do
   describe "caching of results of find" do
     before do
       @post_database_result = { 'id' => 1, 'title' => 'Hello' }
-      @post_records = [Post.send(:instantiate, @post_database_result)]
+      @post_records = [Post.instantiate(@post_database_result)]
       Post.stubs(:find_by_sql_without_kasket).returns(@post_records)
 
       @comment_database_result = [{ 'id' => 1, 'body' => 'Hello' }, { 'id' => 2, 'body' => 'World' }]
-      @comment_records = @comment_database_result.map {|r| Comment.send(:instantiate, r)}
+      @comment_records = @comment_database_result.map { |r| Comment.instantiate(r) }
       Comment.stubs(:find_by_sql_without_kasket).returns(@comment_records)
     end
 

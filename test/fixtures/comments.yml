@@ -10,7 +10,6 @@ few_comments_2:
 
 <% (1..10).each do |i| %>
 many_comments_<%= i %>:
-  post: has_many_comments
+  post_id: 4
   body: what ever body <%= i %>
 <% end %>
-
