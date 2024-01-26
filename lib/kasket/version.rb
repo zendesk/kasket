@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module Kasket
-  VERSION = '4.13.0'
+  VERSION = '4.14.0'
   class Version
     MAJOR = Kasket::VERSION.split('.')[0]
     MINOR = Kasket::VERSION.split('.')[1]
