@@ -6,7 +6,7 @@ gem "pry",         "~> 0.13.1"
 gem "byebug",      "~> 11.1"
 gem "pry-byebug",  "= 3.9.0"
 gem "bump",        "~> 0.10"
-gem "minitest",    "~> 5.1"
+gem "minitest",    "~> 5.16.2" # temporary evil until https://github.com/zendesk/kasket/pull/82
 gem "minitest-rg", "~> 5.2"
 gem "mocha",       "~> 1.13"
 gem "rake",        "~> 13"

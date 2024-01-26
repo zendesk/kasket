@@ -233,6 +233,60 @@ describe Kasket::ReadMixin do
         assert_not_equal @record, same_record
       end
     end
+
+    describe "emitting stats" do
+      before do
+        @previous = Kasket::CONFIGURATION[:events_callback]
+        Kasket::Events.remove_instance_variable(:@fn) if Kasket::Events.instance_variable_defined?(:@fn)
+
+        @emitted_events = []
+        callback = proc do |event, ar_klass|
+          @emitted_events << [event, ar_klass]
+        end
+
+        Kasket::CONFIGURATION[:events_callback] = callback
+      end
+
+      after { Kasket::CONFIGURATION[:events_callback] = @previous }
+
+      describe "event: cache_hit" do
+        it "is emitted when retrieving one record from the cache" do
+          Kasket.cache.write("#{Post.kasket_key_prefix}id=1", @post_database_result)
+
+          assert_empty @emitted_events
+          Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+          assert_equal 1, @emitted_events.length
+          assert_equal ["cache_hit", Post], @emitted_events[0]
+        end
+
+        it "is emitted when retrieving multiple records from the cache" do
+          # The Comment-by-post-id key points to the two Comment-by-id keys.
+          # Each Comment-by-id key contains its own record data.
+          Kasket.cache.write("#{Comment.kasket_key_prefix}post_id=1", [
+            "#{Comment.kasket_key_prefix}id=1",
+            "#{Comment.kasket_key_prefix}id=2"
+          ])
+          Kasket.cache.write("#{Comment.kasket_key_prefix}id=1", @comment_database_result[0])
+          Kasket.cache.write("#{Comment.kasket_key_prefix}id=2", @comment_database_result[1])
+
+          assert_empty @emitted_events
+          Comment.find_by_sql('SELECT * FROM `comments` WHERE (post_id = 1)')
+          assert_equal 1, @emitted_events.length
+          assert_equal ["cache_hit", Comment], @emitted_events[0]
+        end
+
+        it "is NOT emitted when nothing is in the cache the cache" do
+          assert_nil Kasket.cache.read("#{Post.kasket_key_prefix}id=1")
+
+          assert_empty @emitted_events
+          Post.find_by_sql('SELECT * FROM `posts` WHERE (id = 1)')
+          # Other events might have been emitted.
+          @emitted_events.each do |emitted_event|
+            refute_equal ["cache_hit", Post], emitted_event
+          end
+        end
+      end
+    end
   end
 
   it "support serialized attributes" do

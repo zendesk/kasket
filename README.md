@@ -48,6 +48,19 @@ semantics instead. In this mode, the model will be updated in the cache as well 
 Kasket.setup(write_through: true)
 ```
 
+#### Events Callback
+
+You can configure a callable object to listen to events. This can be useful to emit metrics and observe Kasket's behaviour.
+
+```ruby
+Kasket.setup(events_callback: -> (event, ar_klass) do
+  MyMetrics.increase_some_counter("kasket.#{event}", tags: ["table:#{ar_klass.table_name}"])
+end)
+```
+
+The following events are emitted:
+* `"cache_hit"`, when Kasket has found some record's data in the cache, which can be returned.
+
 ## Configuring caching of your models
 
 You can configure Kasket for any ActiveRecord model, and subclasses will automatically inherit the caching
