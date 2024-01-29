@@ -10,11 +10,12 @@ name: Continuous Integration
 jobs:
   tests:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
+        experimental: [false]
         ruby:
-          - '2.6'
           - '2.7'
           - '3.0'
           - '3.1'
@@ -24,13 +25,15 @@ jobs:
           - gemfiles/rails5.2.gemfile
           - gemfiles/rails6.0.gemfile
           - gemfiles/rails6.1.gemfile
+        include:
+          - {ruby: '3.1', gemfile: gemfiles/rails7.0.gemfile, experimental: true}
         exclude:
           - {ruby: '3.0', gemfile: gemfiles/rails5.1.gemfile}
           - {ruby: '3.0', gemfile: gemfiles/rails5.2.gemfile}
           - {ruby: '3.1', gemfile: gemfiles/rails5.1.gemfile}
           - {ruby: '3.1', gemfile: gemfiles/rails5.2.gemfile}
           - {ruby: '3.2', gemfile: gemfiles/rails5.1.gemfile}
-          - {ruby: '3.2', gemfile: gemfiles/rails5.2.gemfile}          
+          - {ruby: '3.2', gemfile: gemfiles/rails5.2.gemfile}
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:

@@ -20,7 +20,7 @@ ActiveSupport.test_order = :random
 
 class ActiveSupport::TestCase
   # all tests inherit from this
-  extend MiniTest::Spec::DSL
+  extend Minitest::Spec::DSL
   register_spec_type(self) { |_desc| true }
 
   include ActiveRecord::TestFixtures
