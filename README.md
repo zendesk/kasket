@@ -1,5 +1,7 @@
 # Kasket
 
+## :warning: Kasket is deprecated and will no longer be maintained. Please consider using Rails native caching as an alternative 
+
 ### Puts a cap on your queries
 A caching layer for ActiveRecord.
 
