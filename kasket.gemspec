@@ -15,4 +15,6 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.7'
 
   s.add_runtime_dependency("activerecord", ">= 5.1", "< 7.1")
+
+  s.post_install_message = "The Kasket gem is deprecated and will no longer be maintained"
 end
